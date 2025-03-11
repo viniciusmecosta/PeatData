@@ -39,7 +39,14 @@ def get_temperature_by_days(days: int):
     filtered = []
     count = 1
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        record_date = datetime.strptime(record["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=fortaleza_tz)
+        try:
+            timestamp_str = record["timestamp"].rstrip('Z')
+            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+            record_date = fortaleza_tz.localize(record_date)
+        except ValueError:
+            print(f"Invalid timestamp format: {record['timestamp']}")
+            continue
+        
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
@@ -56,7 +63,14 @@ def get_temperature_by_date(date: str):
     filtered = []
     count = 1
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        record_date = datetime.strptime(record["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=fortaleza_tz)
+        try:
+            timestamp_str = record["timestamp"].rstrip('Z')
+            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+            record_date = fortaleza_tz.localize(record_date)
+        except ValueError:
+            print(f"Invalid timestamp format: {record['timestamp']}")
+            continue
+        
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
@@ -74,7 +88,14 @@ def get_distance_by_days(days: int):
     filtered = []
     count = 1
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        record_date = datetime.strptime(record["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=fortaleza_tz)
+        try:
+            timestamp_str = record["timestamp"].rstrip('Z')
+            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+            record_date = fortaleza_tz.localize(record_date)
+        except ValueError:
+            print(f"Invalid timestamp format: {record['timestamp']}")
+            continue
+        
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
@@ -91,7 +112,14 @@ def get_distance_by_date(date: str):
     filtered = []
     count = 1
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        record_date = datetime.strptime(record["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=fortaleza_tz)
+        try:
+            timestamp_str = record["timestamp"].rstrip('Z')
+            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+            record_date = fortaleza_tz.localize(record_date)
+        except ValueError:
+            print(f"Invalid timestamp format: {record['timestamp']}")
+            continue
+        
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
