@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from app.domain.services import (
     handle_temperature_humidity,
     handle_distance,
-    get_all_records,
     get_temperature_by_days,
     get_temperature_by_date,
     get_distance_by_days,
@@ -21,9 +20,6 @@ async def post_distance(distance: float):
     handle_distance(distance)
     return {"message": "Distance data received successfully"}
 
-@router.get("/records")
-async def get_records():
-    return get_all_records()
 
 @router.get("/temperature/{days}")
 async def get_temperature_days(days: int):
