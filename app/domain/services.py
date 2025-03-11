@@ -51,7 +51,8 @@ def get_temperature_by_days(days: int):
             filtered.append({
                 "count": count,
                 "data": record["timestamp"],
-                "temp": record["temperature"]
+                "temp": record["temperature"],
+                 "humi": record["humidity"]
             })
             count += 1
     return filtered
@@ -75,7 +76,8 @@ def get_temperature_by_date(date: str):
             filtered.append({
                 "count": count,
                 "data": record["timestamp"],
-                "temp": record["temperature"]
+                "temp": record["temperature"],
+                "humi": record["humidity"]
             })
             count += 1
     return filtered

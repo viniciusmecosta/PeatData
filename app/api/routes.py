@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
+from typing import List
 from app.domain.services import (
     handle_temperature_humidity,
     handle_distance,
@@ -7,27 +9,14 @@ from app.domain.services import (
     get_distance_by_days,
     get_distance_by_date
 )
-from pydantic import BaseModel
-from typing import List
+from app.domain.models import (
+    DistanceRequest, 
+    DistanceResponse, 
+    TemperatureHumidityRequest, 
+    TemperatureResponse
+)
 
 router = APIRouter()
-
-class TemperatureHumidityRequest(BaseModel):
-    temperature: float
-    humidity: float
-
-class DistanceRequest(BaseModel):
-    distance: float
-
-class TemperatureResponse(BaseModel):
-    count: int
-    data: str
-    temp: float
-
-class DistanceResponse(BaseModel):
-    count: int
-    data: str
-    distance: float
 
 @router.post("/temperature-humidity", tags=["ESP"])
 async def post_temperature_humidity(data: TemperatureHumidityRequest):
@@ -85,6 +74,7 @@ async def get_temperature_days(days: int):
     - `count`: Sequence number of the data.
     - `data`: Timestamp when the data was recorded.
     - `temp`: Recorded temperature value.
+    - `humi`: Recorded humidity value.
 
     **Example:**
     ```json
@@ -93,6 +83,7 @@ async def get_temperature_days(days: int):
         "count": 1,
         "data": "2025-03-11T10:20:30Z",
         "temp": 23.5
+        "humi: 10.2"
       }
     ]
     ```
@@ -111,6 +102,7 @@ async def get_temperature_date(date: str):
     - `count`: Sequence number of the data.
     - `data`: Timestamp when the data was recorded.
     - `temp`: Recorded temperature value.
+    - `humi`: Recorded humidity value.
 
     **Example:**
     ```json
@@ -119,6 +111,7 @@ async def get_temperature_date(date: str):
         "count": 1,
         "data": "2025-03-11T10:20:30Z",
         "temp": 23.5
+        "humi: 10.2"
       }
     ]
     ```
