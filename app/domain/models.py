@@ -25,4 +25,4 @@ class TemperatureResponse(BaseModel):
 class DistanceResponse(BaseModel):
     count: int
     data: str
-    distance: float
+    level: int

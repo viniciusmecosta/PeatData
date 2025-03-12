@@ -1,6 +1,8 @@
+from asyncio import constants
 from app.infrastructure.firebase_client import FirebaseClient
 from app.core.settings import settings
 from datetime import datetime, timedelta
+from app.core.constants import DISTANCE_FULL,COMEDOURO_CAPACITY
 import pytz
 
 fortaleza_tz = pytz.timezone('America/Fortaleza')
@@ -22,11 +24,12 @@ def handle_temperature_humidity(temperature: float, humidity: float):
     firebase_client.send_data("sensor_data", data)
 
 def handle_distance(distance: float):
+    level = calculate_comedouro_level(distance)
     timestamp = datetime.now(fortaleza_tz).strftime("%Y-%m-%dT%H:%M:%SZ")
     data = {
         "fields": {
             "timestamp": {"stringValue": timestamp},
-            "distance": {"doubleValue": distance}
+            "level": {"integerValue": level}
         }
     }
     firebase_client.send_data("sensor_distance", data)
@@ -102,7 +105,7 @@ def get_distance_by_days(days: int):
             filtered.append({
                 "count": count,
                 "data": record["timestamp"],
-                "distance": record["distance"]
+                "level": record["level"]
             })
             count += 1
     return filtered
@@ -126,7 +129,25 @@ def get_distance_by_date(date: str):
             filtered.append({
                 "count": count,
                 "data": record["timestamp"],
-                "distance": record["distance"]
+                "level": record["level"]
             })
             count += 1
     return filtered
+
+def add_phone(name: str, number: str):
+    firebase_client.add_phone(name, number)
+
+def get_all_phones():
+    return firebase_client.get_all_phones()
+
+def add_email(name: str, email: str):
+    firebase_client.add_email(name, email)
+
+def get_all_emails():
+    return firebase_client.get_all_emails()
+
+def calculate_comedouro_level(distance: float) -> int:
+    level = 100 - ((distance / (COMEDOURO_CAPACITY - DISTANCE_FULL)) * 100)
+    return round(level)
+
+

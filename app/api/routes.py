@@ -2,6 +2,10 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
 from app.domain.services import (
+    add_email,
+    add_phone,
+    get_all_emails,
+    get_all_phones,
     handle_temperature_humidity,
     handle_distance,
     get_temperature_by_days,
@@ -169,3 +173,36 @@ async def get_distance_date(date: str):
     ```
     """
     return get_distance_by_date(date)
+
+@router.post("/phone")
+async def post_phone(name: str, number: str):
+    """
+    Adds a phone number to the system.
+
+    - **name**: Name associated with the phone number
+    - **number**: Phone number (must be 11 digits)
+    """
+    if len(number) != 11 or not number.isdigit():
+        return {"error": "Number must have 11 digits"}
+    
+    add_phone(name, number)
+    return {"message": "Phone number added successfully"}
+
+@router.get("/phone")
+async def get_phones():
+    """
+    Retrieves all registered phone numbers.
+
+    Returns a list of phone numbers with their associated names.
+    """
+    return get_all_phones()
+
+@router.post("/email")
+async def post_email(name:str, email:str):
+    add_email(name, email)
+    return {"message": "Email added successfully"}
+
+@router.get("/email")
+async def get_emails():
+    return get_all_emails()
+    
