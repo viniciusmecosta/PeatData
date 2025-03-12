@@ -9,11 +9,8 @@ class FirebaseClient:
 
     def send_data(self, collection, data):
         url = f"{self.firestore_url}/{collection}?key={self.api_key}"
-        response = requests.post(url, json=data)
-        if response.status_code == 200:
-            print(f"Dados enviados para {collection} com sucesso!")
-        else:
-            print(f"Erro ao enviar dados para {collection}: {response.text}")
+        requests.post(url, json=data)
+
 
     def get_data(self, collection):
         url = f"{self.firestore_url}/{collection}?key={self.api_key}"
@@ -31,7 +28,6 @@ class FirebaseClient:
             ]
             return records
         else:
-            print(f"Erro ao buscar dados de {collection}: {response.text}")
             return []
         
     def add_phone(self, name: str, number: str):
@@ -59,7 +55,6 @@ class FirebaseClient:
             ]
             return phones
         else:
-            print(f"Erro ao buscar números de telefone: {response.text}")
             return []
     
     def add_email(self, name: str, email: str):
@@ -77,7 +72,7 @@ class FirebaseClient:
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            phones = [
+            emails = [
                 {
                     "name": doc["fields"]["name"]["stringValue"],
                     "email": doc["fields"]["email"]["stringValue"],
@@ -85,7 +80,6 @@ class FirebaseClient:
                 }
                 for doc in data.get("documents", [])
             ]
-            return phones
+            return emails
         else:
-            print(f"Erro ao buscar números de telefone: {response.text}")
             return []

@@ -86,8 +86,8 @@ async def get_temperature_days(days: int):
       {
         "count": 1,
         "data": "2025-03-11T10:20:30Z",
-        "temp": 23.5
-        "humi: 10.2"
+        "temp": 23.5,
+        "humi": 10.2
       }
     ]
     ```
@@ -114,8 +114,8 @@ async def get_temperature_date(date: str):
       {
         "count": 1,
         "data": "2025-03-11T10:20:30Z",
-        "temp": 23.5
-        "humi: 10.2"
+        "temp": 23.5,
+        "humi": 10.2
       }
     ]
     ```
@@ -174,13 +174,13 @@ async def get_distance_date(date: str):
     """
     return get_distance_by_date(date)
 
-@router.post("/phone")
+@router.post("/phone", response_model=List[DistanceResponse], tags=["NOTIFY"])
 async def post_phone(name: str, number: str):
     """
     Adds a phone number to the system.
 
-    - **name**: Name associated with the phone number
-    - **number**: Phone number (must be 11 digits)
+    - **name**: Name associated with the phone number.
+    - **number**: Phone number (must be 11 digits).
     """
     if len(number) != 11 or not number.isdigit():
         return {"error": "Number must have 11 digits"}
@@ -188,7 +188,7 @@ async def post_phone(name: str, number: str):
     add_phone(name, number)
     return {"message": "Phone number added successfully"}
 
-@router.get("/phone")
+@router.get("/phone", response_model=List[DistanceResponse], tags=["NOTIFY"])
 async def get_phones():
     """
     Retrieves all registered phone numbers.
@@ -197,12 +197,22 @@ async def get_phones():
     """
     return get_all_phones()
 
-@router.post("/email")
-async def post_email(name:str, email:str):
+@router.post("/email", response_model=List[DistanceResponse], tags=["NOTIFY"])
+async def post_email(name: str, email: str):
+    """
+    Adds an email address to the system.
+
+    - **name**: Name associated with the email address.
+    - **email**: Email address to be added.
+    """
     add_email(name, email)
     return {"message": "Email added successfully"}
 
-@router.get("/email")
+@router.get("/email", response_model=List[DistanceResponse], tags=["NOTIFY"])
 async def get_emails():
+    """
+    Retrieves all registered email addresses.
+
+    Returns a list of email addresses with their associated names.
+    """
     return get_all_emails()
-    
