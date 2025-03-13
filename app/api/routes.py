@@ -148,7 +148,7 @@ async def get_distance_days(days: int):
     """
     return get_distance_by_days(days)
 
-@router.get("/distance/date/{date}", response_model=List[DistanceResponse], tags=["APP"])
+@router.get("/distance/date/{date}", tags=["APP"])
 async def get_distance_date(date: str):
     """
     Endpoint to get distance data for a specific date.
@@ -174,7 +174,7 @@ async def get_distance_date(date: str):
     """
     return get_distance_by_date(date)
 
-@router.post("/phone", response_model=List[DistanceResponse], tags=["NOTIFY"])
+@router.post("/phone", tags=["NOTIFY"])
 async def post_phone(name: str, number: str):
     """
     Adds a phone number to the system.
@@ -188,7 +188,7 @@ async def post_phone(name: str, number: str):
     add_phone(name, number)
     return {"message": "Phone number added successfully"}
 
-@router.get("/phone", response_model=List[DistanceResponse], tags=["NOTIFY"])
+@router.get("/phone",tags=["NOTIFY"])
 async def get_phones():
     """
     Retrieves all registered phone numbers.
@@ -208,7 +208,7 @@ async def post_email(name: str, email: str):
     add_email(name, email)
     return {"message": "Email added successfully"}
 
-@router.get("/email", response_model=List[DistanceResponse], tags=["NOTIFY"])
+@router.get("/email", tags=["NOTIFY"])
 async def get_emails():
     """
     Retrieves all registered email addresses.
