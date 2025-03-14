@@ -1,5 +1,4 @@
 import requests
-import json
 
 class FirebaseClient:
     def __init__(self, api_key, firestore_url):

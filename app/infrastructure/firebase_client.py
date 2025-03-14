@@ -1,5 +1,4 @@
 import requests
-import json
 from app.core.constants import COMEDOURO_ID
 
 class FirebaseClient:

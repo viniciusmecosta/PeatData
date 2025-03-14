@@ -1,7 +1,11 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 from typing import List
-from app.domain.services import (
+
+from app.model.distance_model import DistanceResponse
+from app.model.temperature_humidity_request import TemperatureHumidityRequest
+from app.model.distance_request import DistanceRequest
+from app.model.temperature_response import TemperatureResponse
+from app.service.services import (
     add_email,
     add_phone,
     get_all_emails,
@@ -12,12 +16,6 @@ from app.domain.services import (
     get_temperature_by_date,
     get_distance_by_days,
     get_distance_by_date
-)
-from app.domain.models import (
-    DistanceRequest, 
-    DistanceResponse, 
-    TemperatureHumidityRequest, 
-    TemperatureResponse
 )
 
 router = APIRouter()
@@ -197,7 +195,7 @@ async def get_phones():
     """
     return get_all_phones()
 
-@router.post("/email", response_model=List[DistanceResponse], tags=["NOTIFY"])
+@router.post("/email", tags=["NOTIFY"])
 async def post_email(name: str, email: str):
     """
     Adds an email address to the system.

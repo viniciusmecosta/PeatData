@@ -1,4 +1,3 @@
-from asyncio import constants
 from app.infrastructure.firebase_client import FirebaseClient
 from app.core.settings import settings
 from datetime import datetime, timedelta
