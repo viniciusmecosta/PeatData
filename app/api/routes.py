@@ -82,7 +82,7 @@ async def get_temperature_days(days: int):
     ```json
     [
       {
-        "count": 1,
+        "count": 0,
         "data": "2025-03-11T10:20:30Z",
         "temp": 23.5,
         "humi": 10.2
@@ -110,7 +110,7 @@ async def get_temperature_date(date: str):
     ```json
     [
       {
-        "count": 1,
+        "count": 0,
         "data": "2025-03-11T10:20:30Z",
         "temp": 23.5,
         "humi": 10.2
@@ -137,7 +137,7 @@ async def get_distance_days(days: int):
     ```json
     [
       {
-        "count": 1,
+        "count": 0,
         "data": "2025-03-11T10:20:30Z",
         "distance": 5.0
       }
@@ -163,7 +163,7 @@ async def get_distance_date(date: str):
     ```json
     [
       {
-        "count": 1,
+        "count": 0,
         "data": "2025-03-11T10:20:30Z",
         "distance": 5.0
       }

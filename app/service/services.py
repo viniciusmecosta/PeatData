@@ -39,7 +39,7 @@ def get_temperature_by_days(days: int):
     records = firebase_client.get_data("sensor_data")
     
     filtered = []
-    count = 1
+    count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
         try:
             timestamp_str = record["timestamp"].rstrip('Z')
@@ -64,7 +64,7 @@ def get_temperature_by_date(date: str):
     records = firebase_client.get_data("sensor_data")
     
     filtered = []
-    count = 1
+    count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
         try:
             timestamp_str = record["timestamp"].rstrip('Z')
@@ -90,7 +90,7 @@ def get_distance_by_days(days: int):
     records = firebase_client.get_data("sensor_distance")
     
     filtered = []
-    count = 1
+    count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
         try:
             timestamp_str = record["timestamp"].rstrip('Z')
@@ -114,7 +114,7 @@ def get_distance_by_date(date: str):
     records = firebase_client.get_data("sensor_distance")
     
     filtered = []
-    count = 1
+    count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
         try:
             timestamp_str = record["timestamp"].rstrip('Z')
