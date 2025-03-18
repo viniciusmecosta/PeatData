@@ -1,7 +1,7 @@
 from app.infrastructure.firebase_client import FirebaseClient
 from app.core.settings import settings
 from datetime import datetime, timedelta
-from app.core.constants import DISTANCE_FULL,COMEDOURO_CAPACITY
+from app.core.constants import DISTANCE_FULL, COMEDOURO_CAPACITY, COMEDOURO_ID
 import pytz
 
 fortaleza_tz = pytz.timezone('America/Fortaleza')
@@ -41,20 +41,13 @@ def get_temperature_by_days(days: int):
     filtered = []
     count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        try:
-            timestamp_str = record["timestamp"].rstrip('Z')
-            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
-            record_date = fortaleza_tz.localize(record_date)
-        except ValueError:
-            print(f"Invalid timestamp format: {record['timestamp']}")
-            continue
-        
+        record_date = parse_timestamp(record["timestamp"])
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
                 "data": record["timestamp"],
                 "temp": record["temperature"],
-                 "humi": record["humidity"]
+                "humi": record["humidity"]
             })
             count += 1
     return filtered
@@ -62,18 +55,12 @@ def get_temperature_by_days(days: int):
 def get_temperature_by_date(date: str):
     target_date = datetime.strptime(date, "%d%m%Y").replace(tzinfo=fortaleza_tz)
     records = firebase_client.get_data("sensor_data")
-    
+
     filtered = []
     count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        try:
-            timestamp_str = record["timestamp"].rstrip('Z')
-            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
-            record_date = fortaleza_tz.localize(record_date)
-        except ValueError:
-            print(f"Invalid timestamp format: {record['timestamp']}")
-            continue
-        
+        record_date = parse_timestamp(record["timestamp"])
+
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
@@ -84,22 +71,43 @@ def get_temperature_by_date(date: str):
             count += 1
     return filtered
 
+def get_last_n_temperature_records(n: int):
+    records = firebase_client.get_data("sensor_data")
+    sorted_records = sorted(records, key=lambda x: x["timestamp"], reverse=True)[:n]
+
+    return [
+        {
+            "count": index,
+            "data": record["timestamp"],
+            "temp": record["temperature"],
+            "humi": record["humidity"]
+        }
+        for index, record in enumerate(sorted_records)
+    ]
+
+def get_last_n_level_records(n: int):
+    records = firebase_client.get_data("sensor_distance")
+    sorted_records = sorted(records, key=lambda x: x["timestamp"], reverse=True)[:n]
+
+    return [
+        {
+            "count": index,
+            "data": record["timestamp"],
+            "level": record["level"]
+        }
+        for index, record in enumerate(sorted_records)
+    ]
+
 def get_distance_by_days(days: int):
     end_date = datetime.now(fortaleza_tz)
     start_date = end_date - timedelta(days=days)
     records = firebase_client.get_data("sensor_distance")
-    
+
     filtered = []
     count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        try:
-            timestamp_str = record["timestamp"].rstrip('Z')
-            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
-            record_date = fortaleza_tz.localize(record_date)
-        except ValueError:
-            print(f"Invalid timestamp format: {record['timestamp']}")
-            continue
-        
+        record_date = parse_timestamp(record["timestamp"])
+
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
@@ -112,18 +120,12 @@ def get_distance_by_days(days: int):
 def get_distance_by_date(date: str):
     target_date = datetime.strptime(date, "%d%m%Y").replace(tzinfo=fortaleza_tz)
     records = firebase_client.get_data("sensor_distance")
-    
+
     filtered = []
     count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-        try:
-            timestamp_str = record["timestamp"].rstrip('Z')
-            record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
-            record_date = fortaleza_tz.localize(record_date)
-        except ValueError:
-            print(f"Invalid timestamp format: {record['timestamp']}")
-            continue
-        
+        record_date = parse_timestamp(record["timestamp"])
+
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
@@ -133,20 +135,59 @@ def get_distance_by_date(date: str):
             count += 1
     return filtered
 
-def add_phone(name: str, number: str):
-    firebase_client.add_phone(name, number)
-
-def get_all_phones():
-    return firebase_client.get_all_phones()
-
-def add_email(name: str, email: str):
-    firebase_client.add_email(name, email)
-
-def get_all_emails():
-    return firebase_client.get_all_emails()
-
 def calculate_comedouro_level(distance: float) -> int:
     level = 100 - ((distance / (COMEDOURO_CAPACITY - DISTANCE_FULL)) * 100)
     return round(level)
 
+def add_phone(name: str, number: str):
+    data = {
+            "fields": {
+                "name": {"stringValue": name},
+                "number": {"stringValue": number},
+                "comedouro": {"integerValue": COMEDOURO_ID}
+            }
+        }
+    firebase_client.send_data("phone", data)
 
+def get_all_phones():
+    records = firebase_client.get_data("phone")
+    return [
+        {
+
+            "name": record["name"],
+            "number": record["number"],
+            "comedouro": record["comedouro"]
+        }
+        for record in records
+    ]
+
+def add_email(name: str, email: str):
+    data = {
+            "fields": {
+                "name": {"stringValue": name},
+                "email": {"stringValue": email},
+                "comedouro": {"integerValue": COMEDOURO_ID}
+            }
+        }
+    firebase_client.send_data("email", data)
+
+def get_all_emails():
+    records = firebase_client.get_data("email")
+    return [
+        {
+
+            "name": record["name"],
+            "email": record["email"],
+            "comedouro": record["comedouro"]
+        }
+        for record in records
+    ]
+
+def parse_timestamp(timestamp: str) -> datetime:
+    try:
+        timestamp_str = timestamp.rstrip('Z')
+        record_date = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+        return fortaleza_tz.localize(record_date)
+    except ValueError:
+        print(f"Invalid timestamp format: {timestamp}")
+        return None
