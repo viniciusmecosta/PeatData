@@ -32,3 +32,14 @@ class FirebaseClient:
             return records
         else:
             return []
+
+    def delete_all_documents(self, collection):
+        url = f"{self.firestore_url}/{collection}?key={self.api_key}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            for doc in data.get("documents", []):
+                doc_name = doc["name"].split("/")[-1]
+                delete_url = f"{self.firestore_url}/{collection}/{doc_name}?key={self.api_key}"
+                requests.delete(delete_url)

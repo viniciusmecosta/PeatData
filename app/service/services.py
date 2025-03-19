@@ -1,3 +1,5 @@
+import random
+
 from app.infrastructure.firebase_client import FirebaseClient
 from app.core.settings import settings
 from datetime import datetime, timedelta
@@ -189,7 +191,7 @@ def get_levels_last_n_avg(n: int):
 
     daily_data = {}
     for entry in filtered:
-        date_str = parse_timestamp(entry["date"]).strftime("%d/%m")  # Formatar como DD/MM
+        date_str = parse_timestamp(entry["date"]).strftime("%d/%m")
         if date_str not in daily_data:
             daily_data[date_str] = {"temp_sum": 0, "level_sum": 0, "count": 0}
 
@@ -263,3 +265,53 @@ def parse_timestamp(timestamp: str) -> datetime:
     except ValueError:
         print(f"Invalid timestamp format: {timestamp}")
         return None
+
+def delete_all_sensor_data():
+    return firebase_client.delete_all_documents("sensor_data")
+
+def delete_all_sensor_distance():
+    return firebase_client.delete_all_documents("sensor_distance")
+
+
+def generate_sensor_data():
+    """
+    This function generates mock temperature and humidity data for the past 31 days.
+    For each day, two records are generated: one for temperature and one for humidity.
+    The data is then sent to the Firestore database.
+    """
+    end_date = datetime.now(fortaleza_tz)
+    for i in range(31):  # For the last 31 days
+        date = end_date - timedelta(days=i)
+        timestamp = date.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        temperature = round(random.uniform(20, 38), 1)
+        humidity = round(random.uniform(30, 85), 1)
+
+        data = {
+            "fields": {
+                "timestamp": {"stringValue": timestamp},
+                "temperature": {"doubleValue": temperature},
+                "humidity": {"doubleValue": humidity}
+            }
+        }
+
+        firebase_client.send_data("sensor_data", data)
+
+def generate_distance_data():
+    end_date = datetime.now(fortaleza_tz)
+    for i in range(31):
+        date = end_date - timedelta(days=i)
+        timestamp = date.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        level = round(random.uniform(0, 23), 1)
+
+        # Prepare data for Firestore
+        data = {
+            "fields": {
+                "timestamp": {"stringValue": timestamp},
+                "level": {"doubleValue": level}
+            }
+        }
+
+        # Send data to Firebase
+        firebase_client.send_data("sensor_distance", data)
