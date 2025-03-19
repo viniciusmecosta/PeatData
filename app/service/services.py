@@ -22,8 +22,8 @@ def handle_temperature_humidity(temperature: float, humidity: float):
     }
     firebase_client.send_data("sensor_data", data)
 
-def handle_distance(distance: float):
-    level = calculate_comedouro_level(distance)
+def handle_level(level: float):
+    level = calculate_comedouro_level(level)
     timestamp = datetime.now(fortaleza_tz).strftime("%Y-%m-%dT%H:%M:%SZ")
     data = {
         "fields": {
@@ -37,7 +37,7 @@ def get_temperature_by_days(days: int):
     end_date = datetime.now(fortaleza_tz)
     start_date = end_date - timedelta(days=days)
     records = firebase_client.get_data("sensor_data")
-    
+
     filtered = []
     count = 0
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
@@ -45,7 +45,7 @@ def get_temperature_by_days(days: int):
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
-                "data": record["timestamp"],
+                "date": record["timestamp"],
                 "temp": record["temperature"],
                 "humi": record["humidity"]
             })
@@ -64,7 +64,7 @@ def get_temperature_by_date(date: str):
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
-                "data": record["timestamp"],
+                "date": record["timestamp"],
                 "temp": record["temperature"],
                 "humi": record["humidity"]
             })
@@ -78,12 +78,50 @@ def get_last_n_temperature_records(n: int):
     return [
         {
             "count": index,
-            "data": record["timestamp"],
+            "date": record["timestamp"],
             "temp": record["temperature"],
             "humi": record["humidity"]
         }
         for index, record in enumerate(sorted_records)
     ]
+
+def get_temperature_last_n_avg(n: int):
+    end_date = datetime.now(fortaleza_tz)
+    start_date = end_date - timedelta(days=n)
+    records = firebase_client.get_data("sensor_data")
+
+    filtered = []
+    for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
+        record_date = parse_timestamp(record["timestamp"])
+        if start_date <= record_date <= end_date:
+            filtered.append({
+                "date": record["timestamp"],
+                "temp": record["temperature"],
+                "humi": record["humidity"]
+            })
+
+    daily_data = {}
+    for entry in filtered:
+        date_str = parse_timestamp(entry["date"]).strftime("%d/%m")
+        if date_str not in daily_data:
+            daily_data[date_str] = {"temp_sum": 0, "humi_sum": 0, "count": 0}
+
+        daily_data[date_str]["temp_sum"] += entry["temp"]
+        daily_data[date_str]["humi_sum"] += entry["humi"]
+        daily_data[date_str]["count"] += 1
+
+    avg_data = []
+    for date, values in daily_data.items():
+        avg_temp = round(values["temp_sum"] / values["count"], 1)
+        avg_humi = round(values["humi_sum"] / values["count"], 1)
+        avg_data.append({
+            "count": len(avg_data),
+            "date": date,
+            "temp": avg_temp,
+            "humi": avg_humi
+        })
+
+    return avg_data
 
 def get_last_n_level_records(n: int):
     records = firebase_client.get_data("sensor_distance")
@@ -92,13 +130,13 @@ def get_last_n_level_records(n: int):
     return [
         {
             "count": index,
-            "data": record["timestamp"],
+            "date": record["timestamp"],
             "level": record["level"]
         }
         for index, record in enumerate(sorted_records)
     ]
 
-def get_distance_by_days(days: int):
+def get_level_by_days(days: int):
     end_date = datetime.now(fortaleza_tz)
     start_date = end_date - timedelta(days=days)
     records = firebase_client.get_data("sensor_distance")
@@ -111,13 +149,13 @@ def get_distance_by_days(days: int):
         if start_date <= record_date <= end_date:
             filtered.append({
                 "count": count,
-                "data": record["timestamp"],
+                "date": record["timestamp"],
                 "level": record["level"]
             })
             count += 1
     return filtered
 
-def get_distance_by_date(date: str):
+def get_level_by_date(date: str):
     target_date = datetime.strptime(date, "%d%m%Y").replace(tzinfo=fortaleza_tz)
     records = firebase_client.get_data("sensor_distance")
 
@@ -129,14 +167,48 @@ def get_distance_by_date(date: str):
         if record_date.date() == target_date.date():
             filtered.append({
                 "count": count,
-                "data": record["timestamp"],
+                "date": record["timestamp"],
                 "level": record["level"]
             })
             count += 1
     return filtered
 
-def calculate_comedouro_level(distance: float) -> int:
-    level = 100 - ((distance / (COMEDOURO_CAPACITY - DISTANCE_FULL)) * 100)
+def get_levels_last_n_avg(n: int):
+    end_date = datetime.now(fortaleza_tz)
+    start_date = end_date - timedelta(days=n)
+    records = firebase_client.get_data("sensor_distance")
+
+    filtered = []
+    for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
+        record_date = parse_timestamp(record["timestamp"])
+        if start_date <= record_date <= end_date:
+            filtered.append({
+                "date": record["timestamp"],
+                "level": record["level"],
+            })
+
+    daily_data = {}
+    for entry in filtered:
+        date_str = parse_timestamp(entry["date"]).strftime("%d/%m")  # Formatar como DD/MM
+        if date_str not in daily_data:
+            daily_data[date_str] = {"temp_sum": 0, "level_sum": 0, "count": 0}
+
+        daily_data[date_str]["level_sum"] += float(entry["level"])
+        daily_data[date_str]["count"] += 1
+
+    avg_data = []
+    for date, values in daily_data.items():
+        avg_level = round(values["level_sum"] / values["count"], 1)
+        avg_data.append({
+            "count": len(avg_data),
+            "date": date,
+            "level": avg_level,
+        })
+
+    return avg_data
+
+def calculate_comedouro_level(level: float) -> int:
+    level = 100 - ((level / (COMEDOURO_CAPACITY - DISTANCE_FULL)) * 100)
     return round(level)
 
 def add_phone(name: str, number: str):

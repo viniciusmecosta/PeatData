@@ -2,6 +2,6 @@ from pydantic import BaseModel
 
 class TemperatureResponse(BaseModel):
     count: int
-    data: str
+    date: str
     temp: float
     humi: float
