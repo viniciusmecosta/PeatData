@@ -1,7 +1,6 @@
 import requests
-from app.core.constants import COMEDOURO_ID
 
-class FirebaseClient:
+class FirebaseRepository:
     def __init__(self, api_key, firestore_url):
         self.api_key = api_key
         self.firestore_url = firestore_url
