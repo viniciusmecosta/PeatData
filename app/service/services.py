@@ -30,7 +30,7 @@ def handle_level(level: float):
     data = {
         "fields": {
             "timestamp": {"stringValue": timestamp},
-            "level": {"integerValue": level}
+            "level": {"doubleValue": level}
         }
     }
     firebase_client.send_data("sensor_distance", data)
@@ -183,19 +183,22 @@ def get_levels_last_n_avg(n: int):
     filtered = []
     for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
         record_date = parse_timestamp(record["timestamp"])
-        if start_date <= record_date <= end_date:
-            filtered.append({
-                "date": record["timestamp"],
-                "level": record["level"],
-            })
+        level = record.get("level")
+
+        if level is not None:
+            if start_date <= record_date <= end_date:
+                filtered.append({
+                    "date": record["timestamp"],
+                    "level": float(level),
+                })
 
     daily_data = {}
     for entry in filtered:
         date_str = parse_timestamp(entry["date"]).strftime("%d/%m")
         if date_str not in daily_data:
-            daily_data[date_str] = {"temp_sum": 0, "level_sum": 0, "count": 0}
+            daily_data[date_str] = {"level_sum": 0, "count": 0}
 
-        daily_data[date_str]["level_sum"] += float(entry["level"])
+        daily_data[date_str]["level_sum"] += entry["level"]
         daily_data[date_str]["count"] += 1
 
     avg_data = []
@@ -209,8 +212,13 @@ def get_levels_last_n_avg(n: int):
 
     return avg_data
 
-def calculate_comedouro_level(level: float) -> int:
-    level = 100 - ((level / (COMEDOURO_CAPACITY - DISTANCE_FULL)) * 100)
+
+def calculate_comedouro_level(level: float) -> float:
+    if level < DISTANCE_FULL:
+        return 100
+    elif level > COMEDOURO_CAPACITY:
+        return 0
+    level = 100 - ((level - DISTANCE_FULL) / (COMEDOURO_CAPACITY - DISTANCE_FULL) * 100)
     return round(level)
 
 def add_phone(name: str, number: str):
@@ -274,13 +282,8 @@ def delete_all_sensor_distance():
 
 
 def generate_sensor_data():
-    """
-    This function generates mock temperature and humidity data for the past 31 days.
-    For each day, two records are generated: one for temperature and one for humidity.
-    The data is then sent to the Firestore database.
-    """
     end_date = datetime.now(fortaleza_tz)
-    for i in range(31):  # For the last 31 days
+    for i in range(31):
         date = end_date - timedelta(days=i)
         timestamp = date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -303,9 +306,9 @@ def generate_distance_data():
         date = end_date - timedelta(days=i)
         timestamp = date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        level = round(random.uniform(0, 23), 1)
+        level = round(random.uniform(2, 25), 1)
+        level = calculate_comedouro_level(level)
 
-        # Prepare data for Firestore
         data = {
             "fields": {
                 "timestamp": {"stringValue": timestamp},
@@ -313,5 +316,4 @@ def generate_distance_data():
             }
         }
 
-        # Send data to Firebase
         firebase_client.send_data("sensor_distance", data)

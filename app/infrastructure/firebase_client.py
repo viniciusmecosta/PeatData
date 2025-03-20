@@ -21,7 +21,7 @@ class FirebaseClient:
 
                     "temperature": doc["fields"].get("temperature", {}).get("doubleValue"),
                     "humidity": doc["fields"].get("humidity", {}).get("doubleValue"),
-                    "level": doc["fields"].get("level", {}).get("integerValue"),
+                    "level": doc["fields"].get("level", {}).get("doubleValue"),
                     "name": doc["fields"].get("name", {}).get("stringValue"),
                     "number": doc["fields"].get("number", {}).get("stringValue"),
                     "email": doc["fields"].get("email", {}).get("stringValue"),
