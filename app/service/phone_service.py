@@ -15,7 +15,7 @@ class PhoneService:
         data = {
             "fields": {
                 "name": {"stringValue": name},
-                "number": {"stringValue": number},
+                "number": {"integerValue": number},
                 "comedouro": {"integerValue": COMEDOURO_ID},
             }
         }

@@ -17,12 +17,16 @@ class FirebaseRepository:
             data = response.json()
             records = [
                 {
-                    "timestamp": doc["fields"].get("timestamp", {}).get("stringValue", "default_value"),
-                    "temperature": doc["fields"].get("temperature", {}).get("doubleValue"),
+                    "timestamp": doc["fields"]
+                    .get("timestamp", {})
+                    .get("stringValue", "default_value"),
+                    "temperature": doc["fields"]
+                    .get("temperature", {})
+                    .get("doubleValue"),
                     "humidity": doc["fields"].get("humidity", {}).get("doubleValue"),
                     "level": doc["fields"].get("level", {}).get("doubleValue"),
                     "name": doc["fields"].get("name", {}).get("stringValue"),
-                    "number": doc["fields"].get("number", {}).get("stringValue"),
+                    "number": doc["fields"].get("number", {}).get("integerValue"),
                     "email": doc["fields"].get("email", {}).get("stringValue"),
                     "comedouro": doc["fields"].get("comedouro", {}).get("integerValue"),
                 }

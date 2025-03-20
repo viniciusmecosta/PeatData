@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
 
-class LevelResponse(BaseModel):
+class SensorData(BaseModel):
     count: int
     date: str
-    level: float
+    temp: float
+    humi: float

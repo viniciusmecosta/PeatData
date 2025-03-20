@@ -3,7 +3,12 @@ from datetime import datetime, timedelta
 import pytz
 
 from app.core.constants import COMEDOURO_ID
-from app.core.utils import calculate_comedouro_level, generate_random_phone, generate_random_name, generate_random_email
+from app.core.utils import (
+    calculate_comedouro_level,
+    generate_random_phone,
+    generate_random_name,
+    generate_random_email,
+)
 from app.repository.firebase_repository import FirebaseRepository
 from app.core.settings import settings
 

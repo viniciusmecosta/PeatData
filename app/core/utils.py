@@ -28,15 +28,26 @@ def calculate_comedouro_level(level: float) -> float:
 
 
 def generate_random_name():
-    simple_names = ["Ana", "Maria", "Jose", "Joao", "Pedro", "Sofia", "Lucas", "Isabela"]
+    simple_names = [
+        "Ana",
+        "Maria",
+        "Jose",
+        "Joao",
+        "Pedro",
+        "Sofia",
+        "Lucas",
+        "Isabela",
+    ]
     return random.choice(simple_names) + " " + random.choice(simple_names)
+
 
 def generate_random_phone():
     number = int(f"{random.randint(11, 99)}9{random.randint(10000000, 99999999)}")
     return number
 
+
 def generate_random_email(name):
-    username = name.lower() + ''.join(random.choice(string.digits) for _ in range(3))
+    username = name.lower() + "".join(random.choice(string.digits) for _ in range(3))
     username = username.replace(" ", "")
     domains = ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com"]
     domain = random.choice(domains)

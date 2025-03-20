@@ -1,25 +1,24 @@
 from fastapi import APIRouter
-
-from app.model.temperature_humidity_request import TemperatureHumidityRequest
+from app.model.sensor_data_request import SensorDataRequest
 from app.model.level_request import LevelRequest
 from app.service.level_service import LevelService
 from app.service.temperature_service import TemperatureService
 
-router = APIRouter()
+router = APIRouter(prefix="/esp")
 temperature_service = TemperatureService()
 level_service = LevelService()
 
 
 @router.post("/temperature-humidity", tags=["ESP"])
-async def post_temperature_humidity(data: TemperatureHumidityRequest):
+async def post_temperature_humidity(data: SensorDataRequest):
     """
-    Endpoint to submit temperature and humidity data.
+    Submit temperature and humidity data.
 
-    **Request body:**
-    - `temperature`: The temperature value to be submitted.
-    - `humidity`: The humidity value to be submitted.
+    **Request body**:
+    - `temperature`: Temperature value.
+    - `humidity`: Humidity value.
 
-    **Example request:**
+    **Example request**:
     ```json
     {
       "temperature": 23.5,
@@ -27,10 +26,7 @@ async def post_temperature_humidity(data: TemperatureHumidityRequest):
     }
     ```
 
-    **Response:**
-    - Success message when data is received.
-
-    **Example response:**
+    **Example response**:
     ```json
     {
       "message": "Temperature and humidity data received successfully"
@@ -44,22 +40,19 @@ async def post_temperature_humidity(data: TemperatureHumidityRequest):
 @router.post("/level", tags=["ESP"])
 async def post_distance(data: LevelRequest):
     """
-    Endpoint to submit Level data.
+    Submit level data.
 
-    **Request body:**
-    - `level`: The Level value to be submitted.
+    **Request body**:
+    - `level`: Level value.
 
-    **Example request:**
+    **Example request**:
     ```json
     {
       "level": 5.0
     }
     ```
 
-    **Response:**
-    - Success message when data is received.
-
-    **Example response:**
+    **Example response**:
     ```json
     {
       "message": "Level data received successfully"
