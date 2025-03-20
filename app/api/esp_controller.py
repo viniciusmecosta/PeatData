@@ -9,6 +9,7 @@ router = APIRouter()
 temperature_service = TemperatureService()
 level_service = LevelService()
 
+
 @router.post("/temperature-humidity", tags=["ESP"])
 async def post_temperature_humidity(data: TemperatureHumidityRequest):
     """
@@ -38,6 +39,7 @@ async def post_temperature_humidity(data: TemperatureHumidityRequest):
     """
     temperature_service.handle_temperature_humidity(data.temperature, data.humidity)
     return {"message": "Temperature and humidity data received successfully"}
+
 
 @router.post("/level", tags=["ESP"])
 async def post_distance(data: LevelRequest):

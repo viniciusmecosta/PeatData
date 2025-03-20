@@ -7,6 +7,7 @@ router = APIRouter()
 phone_service = PhoneService()
 email_service = EmailService()
 
+
 @router.post("/phone", tags=["NOTIFY"])
 async def post_phone(name: str, number: str):
     """

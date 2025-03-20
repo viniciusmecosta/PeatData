@@ -5,6 +5,7 @@ from app.service.admin_service import AdminService
 router = APIRouter()
 admin_service = AdminService()
 
+
 @router.delete("/sensor-data", tags=["ADMIN"])
 async def delete_sensor_data():
     """
@@ -27,6 +28,7 @@ async def delete_sensor_data():
     """
     admin_service.delete_all_sensor_data()
     return {"message": "All sensor data deleted successfully"}
+
 
 @router.delete("/sensor-distance", tags=["ADMIN"])
 async def delete_sensor_distance():
@@ -51,6 +53,7 @@ async def delete_sensor_distance():
     admin_service.delete_all_sensor_distance()
     return {"message": "All sensor distance deleted successfully"}
 
+
 @router.post("/generate_sensor_data", tags=["ADMIN"])
 async def generate_sensor_data_route():
     """
@@ -63,6 +66,7 @@ async def generate_sensor_data_route():
         return {"message": "Sensor data generated successfully!"}
     except Exception as e:
         return {"error": f"An error occurred: {str(e)}"}
+
 
 @router.post("/generate_distance_data", tags=["ADMIN"])
 async def generate_distance_data_route():

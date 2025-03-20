@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class TemperatureResponse(BaseModel):
     count: int
     date: str

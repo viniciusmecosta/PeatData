@@ -11,7 +11,12 @@ router = APIRouter()
 level_service = LevelService()
 temperature_service = TemperatureService()
 
-@router.get("/temperature/last_n_avg/{n}", response_model=List[TemperatureResponse], tags=["APP"])
+
+@router.get(
+    "/temperature/last_n_avg/{n}",
+    response_model=List[TemperatureResponse],
+    tags=["APP"],
+)
 async def get_last_n_avg_temperatures(n: int):
     """
     Endpoint to get the average temperature and humidity for the past N days.
@@ -57,7 +62,9 @@ async def get_last_n_avg_temperatures(n: int):
     return temperature_service.get_temperature_last_n_avg(n)
 
 
-@router.get("/temperature/last/{n}", response_model=List[TemperatureResponse], tags=["APP"])
+@router.get(
+    "/temperature/last/{n}", response_model=List[TemperatureResponse], tags=["APP"]
+)
 async def get_last_n_temperatures(n: int):
     """
     Endpoint to get the last N temperature records, ordered by date.
@@ -90,7 +97,10 @@ async def get_last_n_temperatures(n: int):
     """
     return temperature_service.get_last_n_temperature_records(n)
 
-@router.get("/temperature/{days}", response_model=List[TemperatureResponse], tags=["APP"])
+
+@router.get(
+    "/temperature/{days}", response_model=List[TemperatureResponse], tags=["APP"]
+)
 async def get_temperature_days(days: int):
     """
     Endpoint to get temperature data for the past X days.
@@ -123,7 +133,10 @@ async def get_temperature_days(days: int):
     """
     return temperature_service.get_temperature_by_days(days)
 
-@router.get("/temperature/date/{date}", response_model=List[TemperatureResponse], tags=["APP"])
+
+@router.get(
+    "/temperature/date/{date}", response_model=List[TemperatureResponse], tags=["APP"]
+)
 async def get_temperature_date(date: str):
     """
     Endpoint to get temperature data for a specific date.
@@ -155,6 +168,7 @@ async def get_temperature_date(date: str):
     ```
     """
     return temperature_service.get_temperature_by_date(date)
+
 
 @router.get("/level/last_n_avg/{n}", response_model=List[LevelResponse], tags=["APP"])
 async def get_last_n_avg_levels(n: int):
@@ -200,6 +214,8 @@ async def get_last_n_avg_levels(n: int):
     ```
     """
     return level_service.get_levels_last_n_avg(n)
+
+
 @router.get("/level/last/{n}", response_model=List[LevelResponse], tags=["APP"])
 async def get_last_n_levels(n: int):
     """
@@ -231,6 +247,7 @@ async def get_last_n_levels(n: int):
     """
     return level_service.get_last_n_level_records(n)
 
+
 @router.get("/level/{days}", response_model=List[LevelResponse], tags=["APP"])
 async def get_level_days(days: int):
     """
@@ -261,6 +278,7 @@ async def get_level_days(days: int):
     ```
     """
     return level_service.get_level_by_days(days)
+
 
 @router.get("/level/date/{date}", tags=["APP"])
 async def get_level_date(date: str):

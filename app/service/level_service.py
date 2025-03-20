@@ -5,13 +5,13 @@ from app.core.utils import calculate_comedouro_level, parse_timestamp
 from app.repository.firebase_repository import FirebaseRepository
 from app.core.settings import settings
 
+
 class LevelService:
     def __init__(self):
-        self.repository= FirebaseRepository(
-            api_key=settings.FIREBASE_API_KEY,
-            firestore_url=settings.FIREBASE_URL
+        self.repository = FirebaseRepository(
+            api_key=settings.FIREBASE_API_KEY, firestore_url=settings.FIREBASE_URL
         )
-        self.fortaleza_tz = pytz.timezone('America/Fortaleza')
+        self.fortaleza_tz = pytz.timezone("America/Fortaleza")
 
     def handle_level(self, level: float):
         level = calculate_comedouro_level(level)
@@ -19,7 +19,7 @@ class LevelService:
         data = {
             "fields": {
                 "timestamp": {"stringValue": timestamp},
-                "level": {"doubleValue": level}
+                "level": {"doubleValue": level},
             }
         }
         self.repository.send_data("sensor_distance", data)
@@ -29,11 +29,7 @@ class LevelService:
         sorted_records = sorted(records, key=lambda x: x["timestamp"], reverse=True)[:n]
 
         return [
-            {
-                "count": index,
-                "date": record["timestamp"],
-                "level": record["level"]
-            }
+            {"count": index, "date": record["timestamp"], "level": record["level"]}
             for index, record in enumerate(sorted_records)
         ]
 
@@ -48,16 +44,20 @@ class LevelService:
             record_date = parse_timestamp(record["timestamp"])
 
             if start_date <= record_date <= end_date:
-                filtered.append({
-                    "count": count,
-                    "date": record["timestamp"],
-                    "level": record["level"]
-                })
+                filtered.append(
+                    {
+                        "count": count,
+                        "date": record["timestamp"],
+                        "level": record["level"],
+                    }
+                )
                 count += 1
         return filtered
 
     def get_level_by_date(self, date: str):
-        target_date = datetime.strptime(date, "%d%m%Y").replace(tzinfo=self.fortaleza_tz)
+        target_date = datetime.strptime(date, "%d%m%Y").replace(
+            tzinfo=self.fortaleza_tz
+        )
         records = self.repository.get_data("sensor_distance")
 
         filtered = []
@@ -66,11 +66,13 @@ class LevelService:
             record_date = parse_timestamp(record["timestamp"])
 
             if record_date.date() == target_date.date():
-                filtered.append({
-                    "count": count,
-                    "date": record["timestamp"],
-                    "level": record["level"]
-                })
+                filtered.append(
+                    {
+                        "count": count,
+                        "date": record["timestamp"],
+                        "level": record["level"],
+                    }
+                )
                 count += 1
         return filtered
 
@@ -86,10 +88,12 @@ class LevelService:
 
             if level is not None:
                 if start_date <= record_date <= end_date:
-                    filtered.append({
-                        "date": record["timestamp"],
-                        "level": float(level),
-                    })
+                    filtered.append(
+                        {
+                            "date": record["timestamp"],
+                            "level": float(level),
+                        }
+                    )
 
         daily_data = {}
         for entry in filtered:
@@ -103,11 +107,12 @@ class LevelService:
         avg_data = []
         for date, values in daily_data.items():
             avg_level = round(values["level_sum"] / values["count"], 1)
-            avg_data.append({
-                "count": len(avg_data),
-                "date": date,
-                "level": avg_level,
-            })
+            avg_data.append(
+                {
+                    "count": len(avg_data),
+                    "date": date,
+                    "level": avg_level,
+                }
+            )
 
         return avg_data
-

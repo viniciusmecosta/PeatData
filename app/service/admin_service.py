@@ -6,13 +6,13 @@ from app.core.utils import calculate_comedouro_level
 from app.repository.firebase_repository import FirebaseRepository
 from app.core.settings import settings
 
+
 class AdminService:
     def __init__(self):
         self.repository = FirebaseRepository(
-            api_key=settings.FIREBASE_API_KEY,
-            firestore_url=settings.FIREBASE_URL
+            api_key=settings.FIREBASE_API_KEY, firestore_url=settings.FIREBASE_URL
         )
-        self.fortaleza_tz = pytz.timezone('America/Fortaleza')
+        self.fortaleza_tz = pytz.timezone("America/Fortaleza")
 
     def delete_all_sensor_distance(self):
         return self.repository.delete_all_documents("sensor_distance")
@@ -29,7 +29,7 @@ class AdminService:
             data = {
                 "fields": {
                     "timestamp": {"stringValue": timestamp},
-                    "level": {"doubleValue": level}
+                    "level": {"doubleValue": level},
                 }
             }
 
@@ -51,7 +51,7 @@ class AdminService:
                 "fields": {
                     "timestamp": {"stringValue": timestamp},
                     "temperature": {"doubleValue": temperature},
-                    "humidity": {"doubleValue": humidity}
+                    "humidity": {"doubleValue": humidity},
                 }
             }
 
