@@ -115,7 +115,7 @@ async def get_temperature_date(date: str):
     [
       {
         "count": 0,
-        "date": "2025-03-11T10:20:30Z",
+        "date": "10:20",
         "temp": 23.5,
         "humi": 10.2
       }
@@ -206,7 +206,7 @@ async def get_level_days(days: int):
     return level_service.get_level_by_days(days)
 
 
-@router.get("/level/date/{n}", response_model=List[Level], tags=["APP"])
+@router.get("/level/date/{date}", response_model=List[Level], tags=["APP"])
 async def get_level_date(date: str):
     """
     Get level data for a specific date.
@@ -219,7 +219,7 @@ async def get_level_date(date: str):
     [
       {
         "count": 0,
-        "date": "2025-03-11T10:20:30Z",
+        "date": "10:20",
         "level": 5.0
       }
     ]

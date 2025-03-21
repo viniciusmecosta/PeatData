@@ -59,7 +59,7 @@ class TemperatureService:
                 filtered.append(
                     {
                         "count": count,
-                        "date": record["timestamp"],
+                        "date": record_date.strftime("%H:%M"),
                         "temp": record["temperature"],
                         "humi": record["humidity"],
                     }

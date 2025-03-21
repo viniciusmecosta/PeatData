@@ -69,7 +69,7 @@ class LevelService:
                 filtered.append(
                     {
                         "count": count,
-                        "date": record["timestamp"],
+                        "date": record_date.strftime("%H:%M"),
                         "level": record["level"],
                     }
                 )
