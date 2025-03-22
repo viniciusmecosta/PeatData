@@ -16,7 +16,6 @@ admin_service = AdminService()
 async def generate_sensor_data():
     """
     Generates mock temperature and humidity data for the past 31 days.
-    Two records are generated per day, totaling 62 records, and stored in Firebase Firestore.
     """
     try:
         admin_service.generate_sensor_data()
@@ -38,7 +37,6 @@ async def delete_sensor_data():
 async def generate_distance_data():
     """
     Generates mock distance data for the past 31 days.
-    Two records per day (totaling 62) are stored in Firebase Firestore.
     """
     try:
         admin_service.generate_distance_data()
