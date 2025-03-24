@@ -1,110 +1,52 @@
-from fastapi import APIRouter
-from typing import List
-
+# app/api/notify_controller.py
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.core.database import get_db
 from app.model.email import Email
 from app.model.email_request import EmailRequest
-from app.model.phone import Phone
 from app.model.phone_request import PhoneRequest
 from app.service.email_service import EmailService
 from app.service.phone_service import PhoneService
+from app.model.phone import Phone
+from typing import List
 
 router = APIRouter(prefix="/notify")
-phone_service = PhoneService()
-email_service = EmailService()
 
+def get_email_service(db: Session = Depends(get_db)):
+    return EmailService(db)
 
-@router.post("/phone", tags=["NOTIFY"])
-async def post_phone(request: PhoneRequest):
-    """
-    Adds a phone number to the system.
-
-    **Request**:
-    - `name`: Name associated with the phone number.
-    - `number`: Phone number (must be 11 digits).
-
-    **Example request**:
-    ```json
-    {
-      "name": "João Silva",
-      "number": "11987654321"
-    }
-    ```
-
-    **Example response**:
-    ```json
-    {
-      "message": "Phone number added successfully"
-    }
-    ```
-    """
-    if len(request.number) != 11 or not request.number.isdigit():
-        return {"error": "Number must have 11 digits"}
-
-    phone_service.add_phone(request.name, request.number)
-    return "Phone number added successfully"
-
-
-@router.get("/phone", tags=["NOTIFY"], response_model=List[Phone])
-async def get_phones():
-    """
-    Retrieves all registered phone numbers.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "name": "João Silva",
-        "number": "11987654321",
-        "comedouro": 1,
-      }
-    ]
-    ```
-    """
-    return phone_service.get_all_phones()
-
+def get_phone_service(db: Session = Depends(get_db)):
+    return PhoneService(db)
 
 @router.post("/email", tags=["NOTIFY"])
-async def post_email(request: EmailRequest):
+def post_email(request: EmailRequest, email_service: EmailService = Depends(get_email_service)):
     """
     Adds an email address to the system.
-
-    **Request**:
-    - `name`: Name associated with the email address.
-    - `email`: Email address to be added.
-
-    **Example request**:
-    ```json
-    {
-      "name": "Maria Oliveira",
-      "email": "maria.oliveira@example.com",
-    }
-    ```
-
-    **Example response**:
-    ```json
-    {
-      "message": "Email added successfully"
-    }
-    ```
     """
     email_service.add_email(request.name, request.email)
-    return "Email added successfully"
-
+    return {"message": "Email added successfully"}
 
 @router.get("/email", tags=["NOTIFY"], response_model=List[Email])
-async def get_emails():
+def get_emails(email_service: EmailService = Depends(get_email_service)):
     """
     Retrieves all registered email addresses.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "name": "Maria Oliveira",
-        "email": "maria.oliveira@example.com",
-        "comedouro": 1
-      }
-    ]
-    ```
     """
     return email_service.get_all_emails()
+
+@router.post("/phone", tags=["NOTIFY"])
+def post_phone(request: PhoneRequest, phone_service: PhoneService = Depends(get_phone_service)):
+    """
+    Adds a phone number to the system.
+    """
+    if len(request.number) != 11 or not request.number.isdigit():
+        raise HTTPException(status_code=400, detail="Number must have 11 digits")
+
+    phone_service.add_phone(request.name, request.number)
+    return {"message": "Phone number added successfully"}
+
+@router.get("/phone", tags=["NOTIFY"], response_model=List[Phone])
+def get_phones(phone_service: PhoneService = Depends(get_phone_service)):
+    """
+    Retrieves all registered phone numbers.
+    """
+    return phone_service.get_all_phones()

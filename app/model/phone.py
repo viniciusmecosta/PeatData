@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-
+from uuid import UUID
 
 class Phone(BaseModel):
-    name: str
+    id: UUID
     number: str
-    comedouro: str
+    name: str

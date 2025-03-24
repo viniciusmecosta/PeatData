@@ -1,7 +1,8 @@
 from pydantic import BaseModel
-
+from uuid import UUID
+from datetime import datetime
 
 class Level(BaseModel):
-    count: int
-    date: str
+    id: UUID
     level: float
+    date: datetime
