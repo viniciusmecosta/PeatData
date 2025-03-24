@@ -28,7 +28,7 @@ async def post_temperature_humidity(
 @router.post("/level", tags=["ESP"])
 async def post_distance(
     data: LevelRequest,
-    level_service: LevelService = Depends(get_level_service) # Injeta o serviço
+    level_service: LevelService = Depends(get_level_service)
 ):
     """
     Submit level data.

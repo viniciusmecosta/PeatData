@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 import random
 import uuid
 
-from app.repository.sensor_data_repository import create_sensor_data
+from app.repository.sensor_data_repository import create_sensor_data, get_last_n_avg_sensor_data, \
+    get_sensor_data_by_date, get_sensor_data_by_days, get_last_n_sensor_data_records
 
 
 class SensorService:
@@ -24,7 +25,7 @@ class SensorService:
         current_date = start_date
 
         while current_date <= end_date:
-            temperature = random.uniform(20.0, 30.0) # Usa random.uniform corretamente
+            temperature = random.uniform(20.0, 30.0)
             humidity = random.uniform(50.0, 80.0)
             sensor_data = SensorData(id=uuid.uuid4(), temperature=temperature, humidity=humidity, date=current_date)
             self.db.add(sensor_data)
@@ -35,3 +36,15 @@ class SensorService:
     def delete_all_sensor_data(self):
         self.db.query(SensorData).delete()
         self.db.commit()
+
+    def get_temperature_last_n_avg(self, n: int):
+        return get_last_n_avg_sensor_data(self.db, n)
+
+    def get_last_n_temperature_records(self, n: int):
+        return get_last_n_sensor_data_records(self.db, n)
+
+    def get_temperature_by_days(self, days: int):
+        return get_sensor_data_by_days(self.db, days)
+
+    def get_temperature_by_date(self, date: str):
+        return get_sensor_data_by_date(self.db, date)
