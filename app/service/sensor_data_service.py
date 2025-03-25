@@ -26,7 +26,7 @@ class SensorDataService:
 
     def generate_sensor_data(self):
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=31)
+        start_date = end_date - timedelta(days=31, hours=6)
         current_date = start_date
 
         while current_date <= end_date:
