@@ -58,7 +58,7 @@ def get_last_n_sensor_data_records(db: Session, n: int):
         .order_by(SensorData.date.desc())\
         .limit(n).all()
 
-    return [{"date": r[0].strftime("%d/%m/%Y %H:%M"), "temp": r[1], "humi": r[2]} for r in result]
+    return [{"date": r[0].strftime("%H:%M %d/%m/%y"), "temp": r[1], "humi": r[2]} for r in result]
 
 # Get Sensor Data by Days
 def get_sensor_data_by_days(db: Session, days: int):

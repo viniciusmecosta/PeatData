@@ -12,11 +12,11 @@ def get_level(db: Session, level_id: UUID):
 
 # Create Level
 def create_level(db: Session, level: Level):
-    db_level = LevelDB(**level.dict())  # Convert Pydantic to SQLAlchemy
+    db_level = LevelDB(**level.dict())
     db.add(db_level)
     db.commit()
     db.refresh(db_level)
-    return level  # Return Pydantic Model
+    return level
 
 def get_last_n_avg_level_data(db: Session, n: int):
     end_date = datetime.now()
@@ -38,7 +38,7 @@ def get_last_n_level_records(db: Session, n: int):
         .order_by(LevelDB.date.desc())\
         .limit(n).all()
 
-    return [{"date": r[0].strftime("%d/%m/%Y %H:%M"), "level": r[1]} for r in result]
+    return [{"date": r[0].strftime("%H:%M %d/%m/%y"), "level": r[1]} for r in result]
 
 def get_level_by_days(db: Session, days: int):
     end_date = datetime.now()
@@ -59,3 +59,4 @@ def get_level_by_date(db: Session, date: str):
         .all()
 
     return [{"date": r[0].strftime("%H:%M"), "level": r[1]} for r in result]
+
