@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class SensorDataAvg(BaseModel):
+class SensorDataResponse(BaseModel):
     date: str
     temp: float
     humi: float

@@ -3,35 +3,71 @@ from sqlalchemy.orm import Session
 from app.model.sensor_data_request import SensorDataRequest
 from app.model.level_request import LevelRequest
 from app.service.level_service import LevelService
-from app.service.sensor_service import SensorService
+from app.service.sensor_data_service import SensorDataService
 from app.core.database import get_db
 
 router = APIRouter(prefix="/esp")
 
-def get_sensor_service(db: Session = Depends(get_db)):
-    return SensorService(db)
-
-def get_level_service(db: Session = Depends(get_db)):
-    return LevelService(db)
+def get_services(db: Session = Depends(get_db)):
+    return {
+        "sensor_service": SensorDataService(db),
+        "level_service": LevelService(db),
+    }
 
 @router.post("/temperature-humidity", tags=["ESP"])
 async def post_temperature_humidity(
     data: SensorDataRequest,
-    sensor_service: SensorService = Depends(get_sensor_service) # Injeta o serviço
+    services=Depends(get_services)
 ):
     """
-    Submit temperature and humidity data.
-    """
-    sensor_service.handle_sensor_data(data.temperature, data.humidity)
+        Submit temperature and humidity data.
+
+        **Request body**:
+        - `temperature`: Temperature value.
+        - `humidity`: Humidity value.
+
+        **Example request**:
+        ```json
+        {
+          "temperature": 23.5,
+          "humidity": 60.0
+        }
+        ```
+
+        **Example response**:
+        ```json
+        {
+          "message": "Temperature and humidity data received successfully"
+        }
+        ```
+        """
+    services["sensor_service"].handle_sensor_data(data.temperature, data.humidity)
     return {"message": "Temperature and humidity data received successfully"}
 
 @router.post("/level", tags=["ESP"])
 async def post_distance(
     data: LevelRequest,
-    level_service: LevelService = Depends(get_level_service)
+    services=Depends(get_services)
 ):
     """
-    Submit level data.
-    """
-    level_service.handle_level(data.level)
+        Submit level data.
+
+        **Request body**:
+        - `level`: Level value.
+
+        **Example request**:
+        ```json
+        {
+          "level": 5.0
+        }
+        ```
+
+        **Example response**:
+        ```json
+        {
+          "message": "Level data received successfully"
+        }
+        ```
+        """
+    services["level_service"].handle_level(data.level)
     return {"message": "Level data received successfully"}
