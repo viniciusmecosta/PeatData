@@ -1,118 +1,60 @@
+import random
+from sqlalchemy.orm import Session
+from app.model.level import Level
+from app.repository.level_repository import create_level, get_last_n_avg_level_data, get_last_n_level_records, \
+    get_level_by_days, get_level_by_date
+from app.model.db_models.level import Level as LevelDB
+from app.core.utils import calculate_comedouro_level
 from datetime import datetime, timedelta
-import pytz
-
-from app.core.utils import calculate_comedouro_level, parse_timestamp
-from app.repository.firebase_repository import FirebaseRepository
-from app.core.settings import settings
-
+import uuid
 
 class LevelService:
-    def __init__(self):
-        self.repository = FirebaseRepository(
-            api_key=settings.FIREBASE_API_KEY, firestore_url=settings.FIREBASE_URL
-        )
-        self.fortaleza_tz = pytz.timezone("America/Fortaleza")
+    def __init__(self, db: Session):
+        self.db = db
 
-    def handle_level(self, level: float):
-        level = calculate_comedouro_level(level)
-        timestamp = datetime.now(self.fortaleza_tz).strftime("%Y-%m-%dT%H:%M:%SZ")
-        data = {
-            "fields": {
-                "timestamp": {"stringValue": timestamp},
-                "level": {"doubleValue": level},
-            }
-        }
-        self.repository.send_data("sensor_distance", data)
+    def handle_level(self, level_value: float):
+        calculated_level = calculate_comedouro_level(level_value)
+        level_data = Level(id=uuid.uuid4(), level=calculated_level, date=datetime.now())
+        create_level(self.db, level_data)
+
+    def delete_all_level_data(self):
+        self.db.query(LevelDB).delete()
+        self.db.commit()
+
+    def generate_level_data(self):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=31)
+        current_date = start_date
+
+        while current_date <= end_date:
+            for i in range(2):
+                measurement_time = current_date + timedelta(hours=3 * i)
+
+                if measurement_time > datetime.now():
+                    continue
+
+                raw_level = round(random.uniform(2.0, 25.0), 1)
+                calculated_level = calculate_comedouro_level(raw_level)
+
+                level_data = LevelDB(
+                    id=uuid.uuid4(),
+                    level=calculated_level,
+                    date=measurement_time
+                )
+                self.db.add(level_data)
+
+            current_date += timedelta(days=1)
+
+        self.db.commit()
+
+    def get_last_n_avg_level(self, n: int):
+        return get_last_n_avg_level_data(self.db, n)
 
     def get_last_n_level_records(self, n: int):
-        records = self.repository.get_data("sensor_distance")
-        sorted_records = sorted(records, key=lambda x: x["timestamp"], reverse=True)[:n]
-
-        return [
-            {"count": index, "date": record["timestamp"], "level": record["level"]}
-            for index, record in enumerate(sorted_records)
-        ]
+        return get_last_n_level_records(self.db, n)
 
     def get_level_by_days(self, days: int):
-        end_date = datetime.now(self.fortaleza_tz)
-        start_date = end_date - timedelta(days=days)
-        records = self.repository.get_data("sensor_distance")
-
-        filtered = []
-        count = 0
-        for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-            record_date = parse_timestamp(record["timestamp"])
-
-            if start_date <= record_date <= end_date:
-                filtered.append(
-                    {
-                        "count": count,
-                        "date": record["timestamp"],
-                        "level": record["level"],
-                    }
-                )
-                count += 1
-        return filtered
+        return get_level_by_days(self.db, days)
 
     def get_level_by_date(self, date: str):
-        target_date = datetime.strptime(date, "%d%m%Y").replace(
-            tzinfo=self.fortaleza_tz
-        )
-        records = self.repository.get_data("sensor_distance")
-
-        filtered = []
-        count = 0
-        for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-            record_date = parse_timestamp(record["timestamp"])
-
-            if record_date.date() == target_date.date():
-                filtered.append(
-                    {
-                        "count": count,
-                        "date": record_date.strftime("%H:%M"),
-                        "level": record["level"],
-                    }
-                )
-                count += 1
-        return filtered
-
-    def get_levels_last_n_avg(self, n: int):
-        end_date = datetime.now(self.fortaleza_tz)
-        start_date = end_date - timedelta(days=n)
-        records = self.repository.get_data("sensor_distance")
-
-        filtered = []
-        for record in sorted(records, key=lambda x: x["timestamp"], reverse=True):
-            record_date = parse_timestamp(record["timestamp"])
-            level = record.get("level")
-
-            if level is not None:
-                if start_date <= record_date <= end_date:
-                    filtered.append(
-                        {
-                            "date": record["timestamp"],
-                            "level": float(level),
-                        }
-                    )
-
-        daily_data = {}
-        for entry in filtered:
-            date_str = parse_timestamp(entry["date"]).strftime("%d/%m")
-            if date_str not in daily_data:
-                daily_data[date_str] = {"level_sum": 0, "count": 0}
-
-            daily_data[date_str]["level_sum"] += entry["level"]
-            daily_data[date_str]["count"] += 1
-
-        avg_data = []
-        for date, values in daily_data.items():
-            avg_level = round(values["level_sum"] / values["count"], 1)
-            avg_data.append(
-                {
-                    "count": len(avg_data),
-                    "date": date,
-                    "level": avg_level,
-                }
-            )
-
-        return avg_data
+        return get_level_by_date(self.db, date)

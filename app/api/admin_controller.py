@@ -1,96 +1,83 @@
-from fastapi import APIRouter
-
-from app.core.constants import (
-    DOCUMENT_SENSOR_DISTANCE,
-    DOCUMENT_SENSOR_DATA,
-    DOCUMENT_EMAIL,
-    DOCUMENT_PHONE,
-)
-from app.service.admin_service import AdminService
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.service.email_service import EmailService
+from app.service.level_service import LevelService
+from app.service.phone_service import PhoneService
+from app.service.sensor_data_service import SensorDataService
 
 router = APIRouter(prefix="/admin")
-admin_service = AdminService()
 
+def get_services(db: Session = Depends(get_db)):
+    return {
+        "email_service": EmailService(db),
+        "phone_service": PhoneService(db),
+        "sensor_data_service": SensorDataService(db),
+        "level_service": LevelService(db),
+    }
 
 @router.post("/generate-sensor-data", tags=["ADMIN"])
-async def generate_sensor_data():
+async def generate_sensor_data(services=Depends(get_services)):
     """
-    Generates mock temperature and humidity data for the past 31 days.
+    Generates mock temperature and humidity data for the past 31 days,
+    with two entries per day.
     """
-    try:
-        admin_service.generate_sensor_data()
-        return {"message": "Sensor data generated successfully!"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
-
+    services["sensor_data_service"].generate_sensor_data()
+    return {"message": "Sensor data generated successfully!"}
 
 @router.delete("/sensor-data", tags=["ADMIN"])
-async def delete_sensor_data():
+async def delete_sensor_data(services=Depends(get_services)):
     """
-    Deletes all documents from the `sensor_data` collection in Firebase.
+    Deletes all records from the `sensor_data` table in the database.
     """
-    admin_service.delete_all(DOCUMENT_SENSOR_DATA)
-    return {"message": "All sensor data deleted successfully"}
+    services["sensor_data_service"].delete_all_sensor_data()
+    return {"message": "All sensor data deleted successfully!"}
 
-
-@router.post("/generate-distance-data", tags=["ADMIN"])
-async def generate_distance_data():
+@router.post("/generate-level-data", tags=["ADMIN"])
+async def generate_level_data(services=Depends(get_services)):
     """
-    Generates mock distance data for the past 31 days.
+    Generates mock level/distance data for the past 31 days,
+    with two entries per day.
     """
-    try:
-        admin_service.generate_distance_data()
-        return {"message": "Distance data generated successfully!"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
+    services["level_service"].generate_level_data()
+    return {"message": "Level/distance data generated successfully!"}
 
-
-@router.delete("/sensor-distance", tags=["ADMIN"])
-async def delete_sensor_distance():
+@router.delete("/level", tags=["ADMIN"])
+async def delete_level_data(services=Depends(get_services)):
     """
-    Deletes all documents from the `sensor_distance` collection in Firebase.
+    Deletes all records from the `level_data` table in the database.
     """
-    admin_service.delete_all(DOCUMENT_SENSOR_DISTANCE)
-    return {"message": "All sensor distance data deleted successfully"}
-
+    services["level_service"].delete_all_level_data()
+    return {"message": "All level/distance data deleted successfully!"}
 
 @router.post("/generate-email/{n}", tags=["ADMIN"])
-async def generate_email_data(n: int):
+async def generate_email_data(n: int, services=Depends(get_services)):
     """
-    Generates mock email data with `n` records and stores them in Firebase Firestore.
+    Generates `n` mock email records and stores them in the database.
     """
-    try:
-        admin_service.generate_email_data(n)
-        return {"message": "Email data generated successfully!"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
-
+    services["email_service"].generate_email_data(n)
+    return {"message": "Email data generated successfully!"}
 
 @router.delete("/email", tags=["ADMIN"])
-async def delete_email():
+async def delete_email_data(services=Depends(get_services)):
     """
-    Deletes all documents from the `email` collection in Firebase.
+    Deletes all records from the `email` table in the database.
     """
-    admin_service.delete_all(DOCUMENT_EMAIL)
-    return {"message": "All emails deleted successfully"}
-
+    services["email_service"].delete_all_email_data()
+    return {"message": "All emails deleted successfully!"}
 
 @router.post("/generate-phone/{n}", tags=["ADMIN"])
-async def generate_phone_data(n: int):
+async def generate_phone_data(n: int, services=Depends(get_services)):
     """
-    Generates mock phone data with `n` records and stores them in Firebase Firestore.
+    Generates `n` mock phone records and stores them in the database.
     """
-    try:
-        admin_service.generate_phone_data(n)
-        return {"message": "Phone data generated successfully!"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
-
+    services["phone_service"].generate_phone_data(n)
+    return {"message": "Phone data generated successfully!"}
 
 @router.delete("/phone", tags=["ADMIN"])
-async def delete_phone():
+async def delete_phone_data(services=Depends(get_services)):
     """
-    Deletes all documents from the `phone` collection in Firebase.
+    Deletes all records from the `phone` table in the database.
     """
-    admin_service.delete_all(DOCUMENT_PHONE)
-    return {"message": "All phones deleted successfully"}
+    services["phone_service"].delete_all_phone_data()
+    return {"message": "All phone data deleted successfully!"}

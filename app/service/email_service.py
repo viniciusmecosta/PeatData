@@ -1,34 +1,34 @@
-from app.repository.firebase_repository import FirebaseRepository
-from app.core.settings import settings
+# app/service/email_service.py
+import uuid
 
-from app.core.constants import COMEDOURO_ID
-import pytz
+from sqlalchemy.orm import Session
+from app.repository import email_repository
+from app.model.email import Email
+from app.model.db_models.email import Email as EmailDB
+from typing import List
+from uuid import UUID, uuid4
+from app.core.utils import generate_random_email,generate_random_name
 
 
 class EmailService:
-    def __init__(self):
-        self.repository = FirebaseRepository(
-            api_key=settings.FIREBASE_API_KEY, firestore_url=settings.FIREBASE_URL
-        )
-        self.fortaleza_tz = pytz.timezone("America/Fortaleza")
+    def __init__(self, db: Session):
+        self.db = db
 
     def add_email(self, name: str, email: str):
-        data = {
-            "fields": {
-                "name": {"stringValue": name},
-                "email": {"stringValue": email},
-                "comedouro": {"integerValue": COMEDOURO_ID},
-            }
-        }
-        self.repository.send_data("email", data)
+        email_data = Email(id=uuid4(), name=name, email=email)
+        return email_repository.create_email(self.db, email_data)
 
-    def get_all_emails(self):
-        records = self.repository.get_data("email")
-        return [
-            {
-                "name": record["name"],
-                "email": record["email"],
-                "comedouro": record["comedouro"],
-            }
-            for record in records
-        ]
+    def get_all_emails(self) -> List[Email]:
+        return email_repository.get_all_emails(self.db)
+
+    def generate_email_data(self, n: int):
+        for _ in range(n):
+            name = generate_random_name()
+            email_address = generate_random_email(name)
+            email = EmailDB(id=uuid.uuid4(), name=name, email=email_address)
+            self.db.add(email)
+        self.db.commit()
+
+    def delete_all_email_data(self):
+        self.db.query(EmailDB).delete()
+        self.db.commit()
