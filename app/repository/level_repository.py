@@ -50,12 +50,12 @@ def get_level_by_days(db: Session, days: int):
 
     return [{"date": r[0].strftime("%d/%m/%Y %H:%M"), "level": r[1]} for r in result]
 
-# Get Level by Specific Date
 def get_level_by_date(db: Session, date: str):
     date_obj = datetime.strptime(date, "%d%m%Y").date()
 
     result = db.query(LevelDB.date, LevelDB.level) \
         .filter(func.date(LevelDB.date) == date_obj) \
+        .order_by(LevelDB.date.desc()) \
         .all()
 
     return [{"date": r[0].strftime("%H:%M"), "level": r[1]} for r in result]

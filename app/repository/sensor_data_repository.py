@@ -71,12 +71,13 @@ def get_sensor_data_by_days(db: Session, days: int):
 
     return [{"date": r[0].strftime("%d/%m/%Y %H:%M"), "temp": r[1], "humi": r[2]} for r in result]
 
-# Get Sensor Data by Specific Date
 def get_sensor_data_by_date(db: Session, date: str):
     date_obj = datetime.strptime(date, "%d%m%Y").date()
 
     result = db.query(SensorData.date, SensorData.temperature, SensorData.humidity) \
         .filter(func.date(SensorData.date) == date_obj) \
+        .order_by(SensorData.date.desc()) \
         .all()
 
     return [{"date": r[0].strftime("%H:%M"), "temp": r[1], "humi": r[2]} for r in result]
+

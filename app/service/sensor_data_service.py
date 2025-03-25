@@ -30,8 +30,8 @@ class SensorDataService:
                 if measurement_time > datetime.now():
                     continue
 
-                temperature = round(random.uniform(20.0, 30.0), 1)
-                humidity = round(random.uniform(50.0, 80.0), 1)
+                temperature = round(random.uniform(20.0, 40.0), 1)
+                humidity = round(random.uniform(10.0, 98.0), 1)
 
                 sensor_data = SensorData(
                     id=uuid.uuid4(),
