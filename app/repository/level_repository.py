@@ -3,10 +3,9 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.model.db_models.level import Level as LevelDB
 from app.model.level import Level
-from fastapi import HTTPException
 from uuid import UUID
 
-# Get Level by ID
+
 def get_level(db: Session, level_id: UUID):
     return db.query(LevelDB).filter(LevelDB.id == level_id).first()
 
@@ -32,7 +31,6 @@ def get_last_n_avg_level_data(db: Session, n: int):
 
     return [{"date": r.date, "level": r.level} for r in result]
 
-# Get Last N Level Records
 def get_last_n_level_records(db: Session, n: int):
     result = db.query(LevelDB.date, LevelDB.level)\
         .order_by(LevelDB.date.desc())\

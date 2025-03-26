@@ -17,26 +17,6 @@ def create_sensor_data(db: Session, temperature: float, humidity: float, date: d
     db.refresh(sensor_data)
     return sensor_data
 
-# Update Sensor Data
-def update_sensor_data(db: Session, sensor_data_id: UUID, sensor_data: SensorData):
-    db_sensor_data = db.query(SensorData).filter(SensorData.id == sensor_data_id).first()
-    if not db_sensor_data:
-        raise HTTPException(status_code=404, detail="SensorData não encontrado")
-    for key, value in sensor_data.dict().items():
-        setattr(db_sensor_data, key, value)
-    db.commit()
-    db.refresh(db_sensor_data)
-    return db_sensor_data
-
-# Delete Sensor Data
-def delete_sensor_data(db: Session, sensor_data_id: UUID):
-    db_sensor_data = db.query(SensorData).filter(SensorData.id == sensor_data_id).first()
-    if not db_sensor_data:
-        raise HTTPException(status_code=404, detail="SensorData não encontrado")
-    db.delete(db_sensor_data)
-    db.commit()
-    return db_sensor_data
-
 def get_last_n_avg_sensor_data(db: Session, n: int):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=n)

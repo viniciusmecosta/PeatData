@@ -15,23 +15,6 @@ def create_email(db: Session, email: Email):
     db.refresh(db_email)
     return email
 
-def update_email(db: Session, email_id: UUID, email: Email):
-    db_email = db.query(EmailDB).filter(EmailDB.id == email_id).first()
-    if not db_email:
-        raise HTTPException(status_code=404, detail="Email não encontrado")
-    for key, value in email.dict().items():
-        setattr(db_email, key, value)
-    db.commit()
-    db.refresh(db_email)
-    return email
-
-def delete_email(db: Session, email_id: UUID):
-    db_email = db.query(EmailDB).filter(EmailDB.id == email_id).first()
-    if not db_email:
-        raise HTTPException(status_code=404, detail="Email não encontrado")
-    db.delete(db_email)
-    db.commit()
-    return email
 
 def get_all_emails(db: Session):
     return db.query(EmailDB).all()

@@ -9,14 +9,6 @@ SIMPLE_NAMES = ["Ana", "Maria", "Jose", "Joao", "Pedro", "Sofia", "Lucas", "Isab
 DOMAINS = ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com"]
 
 
-def parse_timestamp(timestamp: str) -> datetime | None:
-    try:
-        record_date = datetime.strptime(timestamp.rstrip("Z"), "%Y-%m-%dT%H:%M:%S")
-        return fortaleza_tz.localize(record_date)
-    except ValueError:
-        return None
-
-
 def calculate_comedouro_level(level: float) -> float:
     if level < DISTANCE_FULL:
         return 100
