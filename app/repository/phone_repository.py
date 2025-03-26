@@ -4,8 +4,10 @@ from app.model.db_models.phone import Phone
 from fastapi import HTTPException
 from uuid import UUID
 
+
 def get_phone(db: Session, phone_id: UUID):
     return db.query(Phone).filter(Phone.id == phone_id).first()
+
 
 def create_phone(db: Session, phone: Phone):
     db_phone = Phone(**phone.dict())

@@ -4,6 +4,7 @@ import uuid
 from sqlalchemy import Column, DateTime, Float, UUID
 from app.core.database import Base
 
+
 class Level(Base):
     __tablename__ = "levels"
 

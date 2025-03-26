@@ -4,8 +4,14 @@ from datetime import datetime, timedelta
 import random
 import uuid
 
-from app.repository.sensor_data_repository import create_sensor_data, get_last_n_avg_sensor_data, \
-    get_sensor_data_by_days, get_last_n_sensor_data_records, get_sensor_data_by_date
+from app.repository.sensor_data_repository import (
+    create_sensor_data,
+    get_last_n_avg_sensor_data,
+    get_sensor_data_by_days,
+    get_last_n_sensor_data_records,
+    get_sensor_data_by_date,
+)
+
 
 class SensorDataService:
     def __init__(self, db: Session):
@@ -37,7 +43,7 @@ class SensorDataService:
                     id=uuid.uuid4(),
                     temperature=temperature,
                     humidity=humidity,
-                    date=measurement_time
+                    date=measurement_time,
                 )
                 self.db.add(sensor_data)
 

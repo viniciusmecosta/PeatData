@@ -14,7 +14,9 @@ def calculate_comedouro_level(level: float) -> float:
         return 100
     if level > COMEDOURO_CAPACITY:
         return 0
-    return round(100 - ((level - DISTANCE_FULL) / (COMEDOURO_CAPACITY - DISTANCE_FULL) * 100))
+    return round(
+        100 - ((level - DISTANCE_FULL) / (COMEDOURO_CAPACITY - DISTANCE_FULL) * 100)
+    )
 
 
 def generate_random_name() -> str:

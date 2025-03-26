@@ -8,6 +8,7 @@ from app.service.sensor_data_service import SensorDataService
 
 router = APIRouter(prefix="/admin")
 
+
 def get_services(db: Session = Depends(get_db)):
     return {
         "email_service": EmailService(db),
@@ -15,6 +16,7 @@ def get_services(db: Session = Depends(get_db)):
         "sensor_data_service": SensorDataService(db),
         "level_service": LevelService(db),
     }
+
 
 @router.post("/generate-sensor-data", tags=["ADMIN"])
 async def generate_sensor_data(services=Depends(get_services)):
@@ -25,6 +27,7 @@ async def generate_sensor_data(services=Depends(get_services)):
     services["sensor_data_service"].generate_sensor_data()
     return {"message": "Sensor data generated successfully!"}
 
+
 @router.delete("/sensor-data", tags=["ADMIN"])
 async def delete_sensor_data(services=Depends(get_services)):
     """
@@ -32,6 +35,7 @@ async def delete_sensor_data(services=Depends(get_services)):
     """
     services["sensor_data_service"].delete_all_sensor_data()
     return {"message": "All sensor data deleted successfully!"}
+
 
 @router.post("/generate-level-data", tags=["ADMIN"])
 async def generate_level_data(services=Depends(get_services)):
@@ -42,6 +46,7 @@ async def generate_level_data(services=Depends(get_services)):
     services["level_service"].generate_level_data()
     return {"message": "Level/distance data generated successfully!"}
 
+
 @router.delete("/level", tags=["ADMIN"])
 async def delete_level_data(services=Depends(get_services)):
     """
@@ -49,6 +54,7 @@ async def delete_level_data(services=Depends(get_services)):
     """
     services["level_service"].delete_all_level_data()
     return {"message": "All level/distance data deleted successfully!"}
+
 
 @router.post("/generate-email/{n}", tags=["ADMIN"])
 async def generate_email_data(n: int, services=Depends(get_services)):
@@ -58,6 +64,7 @@ async def generate_email_data(n: int, services=Depends(get_services)):
     services["email_service"].generate_email_data(n)
     return {"message": "Email data generated successfully!"}
 
+
 @router.delete("/email", tags=["ADMIN"])
 async def delete_email_data(services=Depends(get_services)):
     """
@@ -66,6 +73,7 @@ async def delete_email_data(services=Depends(get_services)):
     services["email_service"].delete_all_email_data()
     return {"message": "All emails deleted successfully!"}
 
+
 @router.post("/generate-phone/{n}", tags=["ADMIN"])
 async def generate_phone_data(n: int, services=Depends(get_services)):
     """
@@ -73,6 +81,7 @@ async def generate_phone_data(n: int, services=Depends(get_services)):
     """
     services["phone_service"].generate_phone_data(n)
     return {"message": "Phone data generated successfully!"}
+
 
 @router.delete("/phone", tags=["ADMIN"])
 async def delete_phone_data(services=Depends(get_services)):

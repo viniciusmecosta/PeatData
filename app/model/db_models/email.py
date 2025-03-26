@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy import Column, String, UUID
 from app.core.database import Base
 
+
 class Email(Base):
     __tablename__ = "emails"
 

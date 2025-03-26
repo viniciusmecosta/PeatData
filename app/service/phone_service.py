@@ -7,6 +7,7 @@ from typing import List
 from uuid import UUID, uuid4
 from app.core.utils import generate_random_phone, generate_random_name
 
+
 class PhoneService:
     def __init__(self, db: Session):
         self.db = db

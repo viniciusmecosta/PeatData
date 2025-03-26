@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, UUID
 from app.core.database import Base
 import uuid
 
+
 class Phone(Base):
     __tablename__ = "phones"
 

@@ -1,5 +1,11 @@
 from fastapi import APIRouter
-from app.api import admin_controller, esp_controller, app_controller, notify_controller, root_contoller
+from app.api import (
+    admin_controller,
+    esp_controller,
+    app_controller,
+    notify_controller,
+    root_contoller,
+)
 
 router = APIRouter()
 

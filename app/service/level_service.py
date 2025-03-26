@@ -1,12 +1,18 @@
 import random
 from sqlalchemy.orm import Session
 from app.model.level import Level
-from app.repository.level_repository import create_level, get_last_n_avg_level_data, get_last_n_level_records, \
-    get_level_by_days, get_level_by_date
+from app.repository.level_repository import (
+    create_level,
+    get_last_n_avg_level_data,
+    get_last_n_level_records,
+    get_level_by_days,
+    get_level_by_date,
+)
 from app.model.db_models.level import Level as LevelDB
 from app.core.utils import calculate_comedouro_level
 from datetime import datetime, timedelta
 import uuid
+
 
 class LevelService:
     def __init__(self, db: Session):
@@ -37,9 +43,7 @@ class LevelService:
                 calculated_level = calculate_comedouro_level(raw_level)
 
                 level_data = LevelDB(
-                    id=uuid.uuid4(),
-                    level=calculated_level,
-                    date=measurement_time
+                    id=uuid.uuid4(), level=calculated_level, date=measurement_time
                 )
                 self.db.add(level_data)
 
