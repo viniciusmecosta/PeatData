@@ -8,7 +8,7 @@ from app.service.level_service import LevelService
 from app.service.sensor_data_service import SensorDataService
 from app.core.database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/app")
 
 
 def get_services(db: Session = Depends(get_db)):
