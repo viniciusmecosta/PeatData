@@ -22,6 +22,7 @@ class LevelService:
         calculated_level = calculate_comedouro_level(level_value)
         level_data = Level(id=uuid.uuid4(), level=calculated_level, date=datetime.now())
         create_level(self.db, level_data)
+        return level_data
 
     def delete_all_level_data(self):
         self.db.query(LevelDB).delete()
