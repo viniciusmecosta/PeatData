@@ -42,11 +42,13 @@ async def post_temperature_humidity(
     }
     ```
     """
-    response = services["sensor_service"].handle_sensor_data(data.temperature, data.humidity)
+    temp, humi, date = services["sensor_service"].handle_sensor_data(data.temperature, data.humidity)
     return {"message": "Temperature and humidity data received successfully",
-            "temperature":f"{response.temperature}",
-            "humidity": f"{response.humidity}"
-                                                 }
+            "temperature":f"{temp}",
+            "humidity": f"{humi}",
+            "date": f"{date}"
+            }
+
 
 
 @router.post("/level", tags=["ESP"])

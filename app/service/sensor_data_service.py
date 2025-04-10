@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import random
 import uuid
 
+from app.model.sensor_data_response import SensorDataResponse
 from app.repository.sensor_data_repository import (
     create_sensor_data,
     get_last_n_avg_sensor_data,
@@ -18,7 +19,9 @@ class SensorDataService:
         self.db = db
 
     def handle_sensor_data(self, temperature: float, humidity: float):
-        create_sensor_data(self.db, temperature, humidity, datetime.now())
+        date = datetime.now()
+        create_sensor_data(self.db, temperature, humidity, date)
+        return(temperature, humidity, date)
 
     def delete_all_sensor_data(self):
         self.db.query(SensorData).delete()
