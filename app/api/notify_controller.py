@@ -40,7 +40,9 @@ def post_email(request: EmailRequest, services=Depends(get_services)):
     **Example response**:
     ```json
     {
-      "message": "Email added successfully"
+      "message": "Email added successfully",
+      "name": "Maria Oliveira",
+      "email": "maria.oliveira@example.com"
     }
     ```
     """
@@ -89,7 +91,9 @@ def post_phone(request: PhoneRequest, services=Depends(get_services)):
     **Example response**:
     ```json
     {
-      "message": "Phone number added successfully"
+      "message": "Phone number added successfully",
+      "name": "João Silva",
+      "number": "11987654321"
     }
     ```
     """
