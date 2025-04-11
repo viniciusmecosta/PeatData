@@ -40,15 +40,18 @@ def post_email(request: EmailRequest, services=Depends(get_services)):
     **Example response**:
     ```json
     {
-      "message": "Email added successfully"
+      "message": "Email added successfully",
+      "name": "Maria Oliveira",
+      "email": "maria.oliveira@example.com"
     }
     ```
     """
     services["email_service"].add_email(request.name, request.email)
-    return {"message": "Email added successfully",
-            "name": f"{request.name}",
-            "email": f"{request.email}"
-            }
+    return {
+        "message": "Email added successfully",
+        "name": f"{request.name}",
+        "email": f"{request.email}",
+    }
 
 
 @router.get("/email", tags=["NOTIFY"], response_model=List[Email])
@@ -89,7 +92,9 @@ def post_phone(request: PhoneRequest, services=Depends(get_services)):
     **Example response**:
     ```json
     {
-      "message": "Phone number added successfully"
+      "message": "Phone number added successfully",
+      "name": "João Silva",
+      "number": "11987654321"
     }
     ```
     """
@@ -97,9 +102,11 @@ def post_phone(request: PhoneRequest, services=Depends(get_services)):
         raise HTTPException(status_code=400, detail="Number must have 11 digits")
 
     services["phone_service"].add_phone(request.name, request.number)
-    return {"message": "Phone number added successfully",
-            "name": f"{request.name}",
-            "number": f"{request.number}"}
+    return {
+        "message": "Phone number added successfully",
+        "name": f"{request.name}",
+        "number": f"{request.number}",
+    }
 
 
 @router.get("/phone", tags=["NOTIFY"], response_model=List[Phone])

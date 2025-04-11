@@ -38,17 +38,22 @@ async def post_temperature_humidity(
     **Example response**:
     ```json
     {
-      "message": "Temperature and humidity data received successfully"
+      "message": "Temperature and humidity data received successfully",
+      "temperature": "23.5",
+      "humidity": "60.0",
+      "date": "2025-04-11 09:46:52.799926"
     }
     ```
     """
-    temp, humi, date = services["sensor_service"].handle_sensor_data(data.temperature, data.humidity)
-    return {"message": "Temperature and humidity data received successfully",
-            "temperature":f"{temp}",
-            "humidity": f"{humi}",
-            "date": f"{date}"
-            }
-
+    sensorData = services["sensor_service"].handle_sensor_data(
+        data.temperature, data.humidity
+    )
+    return {
+        "message": "Temperature and humidity data received successfully",
+        "temperature": f"{sensorData.temp}",
+        "humidity": f"{sensorData.humi}",
+        "date": f"{sensorData.date}",
+    }
 
 
 @router.post("/level", tags=["ESP"])
@@ -69,11 +74,15 @@ async def post_distance(data: LevelRequest, services=Depends(get_services)):
     **Example response**:
     ```json
     {
-      "message": "Level data received successfully"
+      "message": "Level data received successfully",
+      "level": "78.0",
+      "date": "2025-04-11 09:46:52.799926"
     }
     ```
     """
     response = services["level_service"].handle_level(data.level)
-    return {"message": "Level data received successfully",
-            "level": f"{response.level}",
-            "date": f"{response.date}"}
+    return {
+        "message": "Level data received successfully",
+        "level": f"{response.level}",
+        "date": f"{response.date}",
+    }

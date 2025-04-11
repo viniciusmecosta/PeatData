@@ -21,7 +21,7 @@ class SensorDataService:
     def handle_sensor_data(self, temperature: float, humidity: float):
         date = datetime.now()
         create_sensor_data(self.db, temperature, humidity, date)
-        return(temperature, humidity, date)
+        return SensorDataResponse(temp=temperature, humi=humidity, date=str(date))
 
     def delete_all_sensor_data(self):
         self.db.query(SensorData).delete()
