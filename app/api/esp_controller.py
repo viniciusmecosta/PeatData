@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+
+from app.auth.token_authenticator import TokenAuthenticator
 from app.model.sensor_data_request import SensorDataRequest
 from app.model.level_request import LevelRequest
 from app.service.level_service import LevelService
@@ -7,6 +10,7 @@ from app.service.sensor_data_service import SensorDataService
 from app.core.database import get_db
 
 router = APIRouter(prefix="/esp")
+auth = TokenAuthenticator()
 
 
 def get_services(db: Session = Depends(get_db)):
@@ -18,7 +22,9 @@ def get_services(db: Session = Depends(get_db)):
 
 @router.post("/temperature-humidity", tags=["ESP"])
 async def post_temperature_humidity(
-    data: SensorDataRequest, services=Depends(get_services)
+    data: SensorDataRequest,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
 ):
     """
     Submit temperature and humidity data.
@@ -57,7 +63,11 @@ async def post_temperature_humidity(
 
 
 @router.post("/level", tags=["ESP"])
-async def post_distance(data: LevelRequest, services=Depends(get_services)):
+async def post_distance(
+    data: LevelRequest,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Submit level data.
 

@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+
+from app.auth.token_authenticator import TokenAuthenticator
 from app.core.database import get_db
 from app.service.email_service import EmailService
 from app.service.level_service import LevelService
@@ -7,6 +10,7 @@ from app.service.phone_service import PhoneService
 from app.service.sensor_data_service import SensorDataService
 
 router = APIRouter(prefix="/admin")
+auth = TokenAuthenticator()
 
 
 def get_services(db: Session = Depends(get_db)):
@@ -19,7 +23,10 @@ def get_services(db: Session = Depends(get_db)):
 
 
 @router.post("/generate-sensor-data", tags=["ADMIN"])
-async def generate_sensor_data(services=Depends(get_services)):
+async def generate_sensor_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Generates mock temperature and humidity data for the past 31 days,
     with two entries per day.
@@ -29,7 +36,10 @@ async def generate_sensor_data(services=Depends(get_services)):
 
 
 @router.delete("/sensor-data", tags=["ADMIN"])
-async def delete_sensor_data(services=Depends(get_services)):
+async def delete_sensor_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Deletes all records from the `sensor_data` table in the database.
     """
@@ -38,7 +48,10 @@ async def delete_sensor_data(services=Depends(get_services)):
 
 
 @router.post("/generate-level-data", tags=["ADMIN"])
-async def generate_level_data(services=Depends(get_services)):
+async def generate_level_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Generates mock level/distance data for the past 31 days,
     with two entries per day.
@@ -48,7 +61,10 @@ async def generate_level_data(services=Depends(get_services)):
 
 
 @router.delete("/level", tags=["ADMIN"])
-async def delete_level_data(services=Depends(get_services)):
+async def delete_level_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Deletes all records from the `level_data` table in the database.
     """
@@ -57,7 +73,11 @@ async def delete_level_data(services=Depends(get_services)):
 
 
 @router.post("/generate-email/{n}", tags=["ADMIN"])
-async def generate_email_data(n: int, services=Depends(get_services)):
+async def generate_email_data(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Generates `n` mock email records and stores them in the database.
     """
@@ -66,7 +86,10 @@ async def generate_email_data(n: int, services=Depends(get_services)):
 
 
 @router.delete("/email", tags=["ADMIN"])
-async def delete_email_data(services=Depends(get_services)):
+async def delete_email_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Deletes all records from the `email` table in the database.
     """
@@ -75,7 +98,11 @@ async def delete_email_data(services=Depends(get_services)):
 
 
 @router.post("/generate-phone/{n}", tags=["ADMIN"])
-async def generate_phone_data(n: int, services=Depends(get_services)):
+async def generate_phone_data(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Generates `n` mock phone records and stores them in the database.
     """
@@ -84,7 +111,10 @@ async def generate_phone_data(n: int, services=Depends(get_services)):
 
 
 @router.delete("/phone", tags=["ADMIN"])
-async def delete_phone_data(services=Depends(get_services)):
+async def delete_phone_data(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Deletes all records from the `phone` table in the database.
     """

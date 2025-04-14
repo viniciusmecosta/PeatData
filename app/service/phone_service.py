@@ -13,7 +13,6 @@ class PhoneService:
         self.db = db
 
     def add_phone(self, name: str, number: str):
-        """Adiciona um novo telefone."""
         phone_data = Phone(id=uuid4(), name=name, number=number)
         return phone_repository.create_phone(self.db, phone_data)
 

@@ -1,7 +1,9 @@
 from typing import List
 from fastapi import APIRouter, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
+from app.auth.token_authenticator import TokenAuthenticator
 from app.model.level_response import LevelResponse
 from app.model.sensor_data_response import SensorDataResponse
 from app.service.level_service import LevelService
@@ -9,6 +11,7 @@ from app.service.sensor_data_service import SensorDataService
 from app.core.database import get_db
 
 router = APIRouter(prefix="/app")
+auth = TokenAuthenticator()
 
 
 def get_services(db: Session = Depends(get_db)):
@@ -19,7 +22,11 @@ def get_services(db: Session = Depends(get_db)):
 
 
 @router.get("/sensor_data/avg/{n}", tags=["APP"])
-async def get_last_avg_sensor_data(n: int, services=Depends(get_services)):
+async def get_last_avg_sensor_data(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get the average temperature and humidity for the past N days.
 
@@ -48,7 +55,11 @@ async def get_last_avg_sensor_data(n: int, services=Depends(get_services)):
 @router.get(
     "/sensor_data/last/{n}", response_model=List[SensorDataResponse], tags=["APP"]
 )
-async def get_last_n_sensor_data(n: int, services=Depends(get_services)):
+async def get_last_n_sensor_data(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get the last N temperature and humididty records, ordered by date.
 
@@ -77,7 +88,11 @@ async def get_last_n_sensor_data(n: int, services=Depends(get_services)):
 @router.get(
     "/sensor_data/days/{days}", response_model=List[SensorDataResponse], tags=["APP"]
 )
-async def get_sensor_data_days(days: int, services=Depends(get_services)):
+async def get_sensor_data_days(
+    days: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get temperature and humidity data for the past X days.
 
@@ -106,7 +121,11 @@ async def get_sensor_data_days(days: int, services=Depends(get_services)):
 @router.get(
     "/sensor_data/date/{date}", response_model=List[SensorDataResponse], tags=["APP"]
 )
-async def get_sensor_data_date(date: str, services=Depends(get_services)):
+async def get_sensor_data_date(
+    date: str,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get temperature data for a specific date.
 
@@ -128,7 +147,11 @@ async def get_sensor_data_date(date: str, services=Depends(get_services)):
 
 
 @router.get("/level/avg/{n}", tags=["APP"])
-async def get_last_avg_level(n: int, services=Depends(get_services)):
+async def get_last_avg_level(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get the average level for the past N days.
 
@@ -153,7 +176,11 @@ async def get_last_avg_level(n: int, services=Depends(get_services)):
 
 
 @router.get("/level/last/{n}", response_model=List[LevelResponse], tags=["APP"])
-async def get_last_n_level_data(n: int, services=Depends(get_services)):
+async def get_last_n_level_data(
+    n: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get the last N level records, ordered by date.
 
@@ -178,7 +205,11 @@ async def get_last_n_level_data(n: int, services=Depends(get_services)):
 
 
 @router.get("/level/days/{days}", response_model=List[LevelResponse], tags=["APP"])
-async def get_level_days(days: int, services=Depends(get_services)):
+async def get_level_days(
+    days: int,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get level data for the past X days.
 
@@ -203,7 +234,11 @@ async def get_level_days(days: int, services=Depends(get_services)):
 
 
 @router.get("/level/date/{date}", response_model=List[LevelResponse], tags=["APP"])
-async def get_level_date(date: str, services=Depends(get_services)):
+async def get_level_date(
+    date: str,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Get level data for a specific date.
 

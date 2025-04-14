@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.auth.token_authenticator import TokenAuthenticator
 from app.core.database import get_db
 from app.model.email import Email
 from app.model.email_request import EmailRequest
@@ -11,6 +13,7 @@ from app.service.phone_service import PhoneService
 from app.model.phone import Phone
 
 router = APIRouter(prefix="/notify")
+auth = TokenAuthenticator()
 
 
 def get_services(db: Session = Depends(get_db)):
@@ -21,7 +24,11 @@ def get_services(db: Session = Depends(get_db)):
 
 
 @router.post("/email", tags=["NOTIFY"])
-def post_email(request: EmailRequest, services=Depends(get_services)):
+def post_email(
+    request: EmailRequest,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Adds an email address in the database.
 
@@ -55,7 +62,10 @@ def post_email(request: EmailRequest, services=Depends(get_services)):
 
 
 @router.get("/email", tags=["NOTIFY"], response_model=List[Email])
-def get_emails(services=Depends(get_services)):
+def get_emails(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Retrieves all registered email addresses.
 
@@ -73,7 +83,11 @@ def get_emails(services=Depends(get_services)):
 
 
 @router.post("/phone", tags=["NOTIFY"])
-def post_phone(request: PhoneRequest, services=Depends(get_services)):
+def post_phone(
+    request: PhoneRequest,
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Adds a phone number in the database.
 
@@ -110,7 +124,10 @@ def post_phone(request: PhoneRequest, services=Depends(get_services)):
 
 
 @router.get("/phone", tags=["NOTIFY"], response_model=List[Phone])
-def get_phones(services=Depends(get_services)):
+def get_phones(
+    services=Depends(get_services),
+    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
+):
     """
     Retrieves all registered phone numbers.
 

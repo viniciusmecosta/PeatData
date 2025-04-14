@@ -17,4 +17,4 @@ async def get_favicon():
     if os.path.exists(favicon_path):
         return FileResponse(favicon_path)
     else:
-        return {"detail": "Favicon not found"}
+        return {"message": "Favicon not found"}
