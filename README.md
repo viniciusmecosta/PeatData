@@ -6,6 +6,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Getting Started](#getting-started)
 - [Authentication](#authentication)
 - [Endpoints](#endpoints)
   - [ESP Endpoints](#esp-endpoints)
@@ -13,8 +14,6 @@
   - [Notification Endpoints](#notification-endpoints)
   - [Admin Endpoints](#admin-endpoints)
 - [Request/Response Examples](#requestresponse-examples)
-- [Data Schemas](#data-schemas)
-- [Error Handling](#error-handling)
 - [Usage Examples](#usage-examples)
 
 ## Overview
@@ -26,6 +25,42 @@ The Peat Data API provides a comprehensive interface for:
 - Managing notification contacts
 - Administrative data management
 
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/viniciusmecosta/PeatData.git
+cd PeatData
+```
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
+```
+
+### 3. Create a `.env` file
+
+Create a `.env` file in the root directory of the project with the required environment variables. Example:
+
+```
+API_KEY=your_api_key_here
+```
+
+### 4. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Run the server
+
+```bash
+uvicorn app.main:app --reload
+```
+
 ## Authentication
 
 ```http
@@ -35,6 +70,7 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
 All endpoints require Bearer Token authentication.
 
 ## Endpoints
+
 ...
 
 ## Usage Examples
