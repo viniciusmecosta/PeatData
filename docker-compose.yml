@@ -7,5 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - ./peat_data.db:/app/peat_data.db
     env_file:
       - .env
+    restart: unless-stopped
