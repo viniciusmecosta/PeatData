@@ -1,7 +1,5 @@
-# app/repository/phone_repository.py
 from sqlalchemy.orm import Session
 from app.model.db_models.phone import Phone
-from fastapi import HTTPException
 from uuid import UUID
 
 

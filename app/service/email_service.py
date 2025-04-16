@@ -1,4 +1,3 @@
-# app/service/email_service.py
 import uuid
 
 from sqlalchemy.orm import Session

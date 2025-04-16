@@ -1,6 +1,4 @@
 import random
-import string
-from datetime import datetime
 import pytz
 from app.core.constants import DISTANCE_FULL, COMEDOURO_CAPACITY
 

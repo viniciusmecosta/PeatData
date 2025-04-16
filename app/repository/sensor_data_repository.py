@@ -2,16 +2,13 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.model.db_models.sensor_data import SensorData
-from fastapi import HTTPException
 from uuid import UUID
 
 
-# Get Sensor Data by ID
 def get_sensor_data(db: Session, sensor_data_id: UUID):
     return db.query(SensorData).filter(SensorData.id == sensor_data_id).first()
 
 
-# Create Sensor Data
 def create_sensor_data(
     db: Session, temperature: float, humidity: float, date: datetime
 ):
@@ -55,7 +52,6 @@ def get_last_n_sensor_data_records(db: Session, n: int):
     ]
 
 
-# Get Sensor Data by Days
 def get_sensor_data_by_days(db: Session, days: int):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)

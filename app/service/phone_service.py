@@ -4,7 +4,7 @@ from app.repository import phone_repository
 from app.model.phone import Phone
 from app.model.db_models.phone import Phone as PhoneDB
 from typing import List
-from uuid import UUID, uuid4
+from uuid import uuid4
 from app.core.utils import generate_random_phone, generate_random_name
 
 

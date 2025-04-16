@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from app.model.email import Email
 from app.model.db_models.email import Email as EmailDB
-from fastapi import HTTPException
 from uuid import UUID
 
 

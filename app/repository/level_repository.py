@@ -10,7 +10,6 @@ def get_level(db: Session, level_id: UUID):
     return db.query(LevelDB).filter(LevelDB.id == level_id).first()
 
 
-# Create Level
 def create_level(db: Session, level: Level):
     db_level = LevelDB(**level.dict())
     db.add(db_level)
