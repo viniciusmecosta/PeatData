@@ -10,15 +10,7 @@ def get_level(db: Session, level_id: UUID):
     return db.query(LevelDB).filter(LevelDB.id == level_id).first()
 
 
-<<<<<<< HEAD
-=======
-# Create Level
-from datetime import timedelta
-
-
->>>>>>> 118ba68 (fix: update time -3)
 def create_level(db: Session, level: Level):
-    level.date = level.date - timedelta(hours=3)
     db_level = LevelDB(**level.dict())
     db.add(db_level)
     db.commit()
