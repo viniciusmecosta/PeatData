@@ -5,7 +5,7 @@ from app.repository import email_repository
 from app.model.email import Email
 from app.model.db_models.email import Email as EmailDB
 from typing import List
-from uuid import UUID, uuid4
+from uuid import uuid4
 from app.core.utils import generate_random_email, generate_random_name
 
 

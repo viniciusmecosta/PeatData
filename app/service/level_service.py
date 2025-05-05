@@ -1,6 +1,8 @@
 import random
 from sqlalchemy.orm import Session
 from app.model.level import Level
+from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta
 from app.repository.level_repository import (
     create_level,
     get_last_n_avg_level_data,
@@ -20,7 +22,11 @@ class LevelService:
 
     def handle_level(self, level_value: float):
         calculated_level = calculate_comedouro_level(level_value)
-        level_data = Level(id=uuid.uuid4(), level=calculated_level, date=datetime.now())
+        level_data = Level(
+            id=uuid.uuid4(),
+            level=calculated_level,
+            date=datetime.now(ZoneInfo("America/Fortaleza")),
+        )
         create_level(self.db, level_data)
         return level_data
 
@@ -29,15 +35,21 @@ class LevelService:
         self.db.commit()
 
     def generate_level_data(self):
-        end_date = datetime.now()
+        tz = ZoneInfo("America/Fortaleza")
+        now = datetime.now(tz)
+        end_date = now
         start_date = end_date - timedelta(days=31)
         current_date = start_date
 
-        while current_date <= end_date:
-            for i in range(2):
-                measurement_time = current_date + timedelta(hours=3 * i)
+        delta_times = [timedelta(hours=-6), timedelta(hours=-3)]
 
-                if measurement_time > datetime.now():
+        while current_date <= end_date:
+            for delta in delta_times:
+                measurement_time = (
+                    datetime.combine(current_date.date(), now.time(), tzinfo=tz) + delta
+                )
+
+                if measurement_time > now:
                     continue
 
                 raw_level = round(random.uniform(2.0, 25.0), 1)
