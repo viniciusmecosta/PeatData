@@ -12,7 +12,7 @@ from app.service.email_service import EmailService
 from app.service.phone_service import PhoneService
 from app.model.phone import Phone
 
-router = APIRouter(prefix="/notify")
+router = APIRouter()
 auth = TokenAuthenticator()
 
 

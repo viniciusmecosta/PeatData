@@ -9,7 +9,7 @@ from app.service.level_service import LevelService
 from app.service.phone_service import PhoneService
 from app.service.sensor_data_service import SensorDataService
 
-router = APIRouter(prefix="/admin")
+router = APIRouter()
 auth = TokenAuthenticator()
 
 
