@@ -69,8 +69,8 @@ def handle_level(payload):
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
         logger.info("Connected to MQTT broker")
-        client.subscribe(MQTT_TOPIC_SENSOR, qos=1)
-        client.subscribe(MQTT_TOPIC_LEVEL, qos=1)
+        client.subscribe(MQTT_TOPIC_SENSOR, qos=2)
+        client.subscribe(MQTT_TOPIC_LEVEL, qos=2)
     else:
         logger.error(f"Failed to connect to MQTT broker. Return code: {rc}")
 
