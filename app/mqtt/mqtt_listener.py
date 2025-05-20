@@ -9,12 +9,12 @@ from app.core.mqtt_core import (
     MQTT_USER,
 )
 import colorlog
-import paho.mqtt.client as mqtt
+import paho.mqtt.client as paho
+from paho import mqtt
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.service.sensor_data_service import SensorDataService
 from app.service.level_service import LevelService
-
 
 handler = colorlog.StreamHandler()
 handler.setFormatter(
@@ -29,7 +29,6 @@ handler.setFormatter(
         },
     )
 )
-
 logger = colorlog.getLogger()
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
@@ -67,11 +66,11 @@ def handle_level(payload):
         db.close()
 
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
         logger.info("Connected to MQTT broker")
-        client.subscribe(MQTT_TOPIC_SENSOR)
-        client.subscribe(MQTT_TOPIC_LEVEL)
+        client.subscribe(MQTT_TOPIC_SENSOR, qos=1)
+        client.subscribe(MQTT_TOPIC_LEVEL, qos=1)
     else:
         logger.error(f"Failed to connect to MQTT broker. Return code: {rc}")
 
@@ -85,9 +84,11 @@ def on_message(client, userdata, msg):
 
 
 def start_mqtt_listener():
-    client = mqtt.Client()
-    if MQTT_USER:
-        client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+    client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
+    client.enable_logger(logger)
+    client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+    client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
+    client.tls_insecure_set(True)
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
