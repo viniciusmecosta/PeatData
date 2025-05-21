@@ -35,6 +35,7 @@ logger.setLevel(logging.INFO)
 
 
 def handle_temperature_humidity(payload):
+    db = None
     try:
         data = json.loads(payload)
         db: Session = SessionLocal()
@@ -48,10 +49,12 @@ def handle_temperature_humidity(payload):
     except Exception as e:
         logger.error(f"Error saving sensor data: {e}")
     finally:
-        db.close()
+        if db is not None and db.is_active:
+            db.close()
 
 
 def handle_level(payload):
+    db = None
     try:
         data = json.loads(payload)
         db: Session = SessionLocal()
@@ -63,7 +66,8 @@ def handle_level(payload):
     except Exception as e:
         logger.error(f"Error saving level data: {e}")
     finally:
-        db.close()
+        if db is not None and db.is_active:
+            db.close()
 
 
 def on_connect(client, userdata, flags, rc, properties=None):
@@ -72,7 +76,18 @@ def on_connect(client, userdata, flags, rc, properties=None):
         client.subscribe(MQTT_TOPIC_SENSOR, qos=2)
         client.subscribe(MQTT_TOPIC_LEVEL, qos=2)
     else:
-        logger.error(f"Failed to connect to MQTT broker. Return code: {rc}")
+        logger.error(
+            f"Failed to connect to MQTT broker. Return code: {rc}. The client will attempt to reconnect automatically."
+        )
+
+
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        logger.warning(
+            f"Disconnected from MQTT broker unexpectedly (code: {rc}). Client will try to reconnect in 2 minutes."
+        )
+    else:
+        logger.info("Disconnected from MQTT broker gracefully.")
 
 
 def on_message(client, userdata, msg):
@@ -88,8 +103,17 @@ def start_mqtt_listener():
     client.enable_logger(logger)
     client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
     client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
-    client.tls_insecure_set(True)
+
     client.on_connect = on_connect
     client.on_message = on_message
-    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    client.on_disconnect = on_disconnect
+
+    client.reconnect_delay_set(min_delay=120, max_delay=120)
+
     client.loop_start()
+
+    logger.info(f"Initiating MQTT connection to {MQTT_BROKER}:{MQTT_PORT}")
+    try:
+        client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    except Exception as e:
+        logger.error(f"MQTT connection attempt failed: {e}. Retrying in 2 minutes...")
