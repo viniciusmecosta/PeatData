@@ -1,6 +1,6 @@
 # Peat Data API Documentation
 
-![API Version](https://img.shields.io/badge/API%20Version-1.0.0-blue)
+![API Version](https://img.shields.io/badge/API%20Version-2.0.0-blue)
 ![Authentication](https://img.shields.io/badge/Authentication-Bearer%20Token-green)
 
 ## Table of Contents
@@ -8,6 +8,7 @@
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Authentication](#authentication)
+- [MQTT Client](#mqtt-client)
 - [Endpoints](#endpoints)
   - [ESP Endpoints](#esp-endpoints)
   - [App Endpoints](#app-endpoints)
@@ -20,20 +21,23 @@
 
 The Peat Data API provides a comprehensive interface for:
 
-- IoT devices to submit sensor readings
+- Receiving data from IoT devices via an MQTT server and storing it in the database.
 - Mobile applications to retrieve historical data
 - Managing notification contacts
 - Administrative data management
 
+---
+
 ## Getting Started
 
-### 1. Clone the repository
+### 1\. Clone the repository
 
 ```bash
 git clone https://github.com/viniciusmecosta/PeatData.git
 cd PeatData
 ```
-### 2. Create and activate a virtual environment
+
+### 2\. Create and activate a virtual environment
 
 ```bash
 python -m venv .venv
@@ -41,37 +45,67 @@ source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows
 ```
 
-### 3. Create a `.env` file
+### 3\. Create a `.env` file
 
 Create a `.env` file in the root directory of the project with the required environment variables. Example:
 
-```
-API_KEY=your_api_key_here
+```env
+API_TOKEN=xxx
+MQTT_BROKER=xxx
+MQTT_PORT=xxx
+MQTT_USER=xxx
+MQTT_PASSWORD=xxx
+MQTT_TOPIC_SENSOR=xxx
+MQTT_TOPIC_LEVEL=xxx
 ```
 
-### 4. Install dependencies
+### 4\. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Run the server
+### 5\. Run the server
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
 
+---
+
 ## Authentication
+
+All API endpoints require Bearer Token authentication. Include the token in the `Authorization` header:
 
 ```http
 Authorization: Bearer YOUR_ACCESS_TOKEN
 ```
 
-All endpoints require Bearer Token authentication.
+---
+
+## MQTT Client
+
+The API acts as an MQTT client. It subscribes to messages from the MQTT broker on the topics defined in the environment variables (`MQTT_TOPIC_SENSOR`, `MQTT_TOPIC_LEVEL`). The API processes these incoming messages and stores the relevant data in the database. This functionality utilizes the `paho-mqtt` library.
+
+---
 
 ## Endpoints
 
 ...
+
+### ESP Endpoints
+
+### App Endpoints
+
+### Notification Endpoints
+
+### Admin Endpoints
+
+---
+
+## Request/Response Examples
+
+---
 
 ## Usage Examples
 

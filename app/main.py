@@ -5,8 +5,12 @@ from app.mqtt.mqtt_listener import start_mqtt_listener
 
 app = FastAPI(
     title="Peat Data API",
-    description="Database operations API, integrating mobile app, embedded system, and notification service.",
-    version="1.0.0",
+    description="""
+    API for managing Peat Data operations, integrating **IoT devices** (via MQTT), 
+    **mobile applications** (historical data), and **notification services**, 
+    along with **administrative functions**.
+    """,
+    version="2.0.0",
 )
 
 app.add_middleware(
