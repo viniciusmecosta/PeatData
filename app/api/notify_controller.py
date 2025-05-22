@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import List
@@ -44,7 +44,7 @@ def post_email(
     }
     ```
 
-    **Example response**:
+    **Example response (Success)**:
     ```json
     {
       "message": "Email added successfully",
@@ -52,8 +52,20 @@ def post_email(
       "email": "maria.oliveira@example.com"
     }
     ```
+
+    **Example response (Error - Email already exists)**:
+    ```json
+    {
+      "detail": "Email 'maria.oliveira@example.com' already exists."
+    }
+    ```
     """
-    services["email_service"].add_email(request.name, request.email)
+    result = services["email_service"].add_email(request.name, request.email)
+
+    if isinstance(result, dict) and "error" in result:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=result["error"]
+        )
     return {
         "message": "Email added successfully",
         "name": f"{request.name}",

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.repository import email_repository
 from app.model.email import Email
 from app.model.db_models.email import Email as EmailDB
-from typing import List
+from typing import List, Union
 from uuid import uuid4
 from app.core.utils import generate_random_email, generate_random_name
 
@@ -13,7 +13,10 @@ class EmailService:
     def __init__(self, db: Session):
         self.db = db
 
-    def add_email(self, name: str, email: str):
+    def add_email(self, name: str, email: str) -> Union[Email, dict]:
+        existing_email = email_repository.get_email_by_address(self.db, email)
+        if existing_email:
+            return {"error": f"Email '{email}' already exists."}
         email_data = Email(id=uuid4(), name=name, email=email)
         return email_repository.create_email(self.db, email_data)
 
