@@ -22,7 +22,7 @@ def get_services(db: Session = Depends(get_db)):
     }
 
 
-@router.post("/generate-sensor-data", tags=["ADMIN"])
+@router.post("/generate-temp-humi-data")
 async def generate_sensor_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
@@ -35,7 +35,7 @@ async def generate_sensor_data(
     return {"message": "Sensor data generated successfully!"}
 
 
-@router.delete("/sensor-data", tags=["ADMIN"])
+@router.delete("/temp-humi")
 async def delete_sensor_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
@@ -47,7 +47,7 @@ async def delete_sensor_data(
     return {"message": "All sensor data deleted successfully!"}
 
 
-@router.post("/generate-level-data", tags=["ADMIN"])
+@router.post("/generate-level-data")
 async def generate_level_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
@@ -60,7 +60,7 @@ async def generate_level_data(
     return {"message": "Level/distance data generated successfully!"}
 
 
-@router.delete("/level", tags=["ADMIN"])
+@router.delete("/level")
 async def delete_level_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
@@ -72,7 +72,7 @@ async def delete_level_data(
     return {"message": "All level/distance data deleted successfully!"}
 
 
-@router.post("/generate-email/{n}", tags=["ADMIN"])
+@router.post("/generate-email/{n}")
 async def generate_email_data(
     n: int,
     services=Depends(get_services),
@@ -85,7 +85,7 @@ async def generate_email_data(
     return {"message": "Email data generated successfully!"}
 
 
-@router.delete("/email", tags=["ADMIN"])
+@router.delete("/email")
 async def delete_email_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
@@ -97,7 +97,7 @@ async def delete_email_data(
     return {"message": "All emails deleted successfully!"}
 
 
-@router.post("/generate-phone/{n}", tags=["ADMIN"])
+@router.post("/generate-phone/{n}")
 async def generate_phone_data(
     n: int,
     services=Depends(get_services),
@@ -110,7 +110,7 @@ async def generate_phone_data(
     return {"message": "Phone data generated successfully!"}
 
 
-@router.delete("/phone", tags=["ADMIN"])
+@router.delete("/phone")
 async def delete_phone_data(
     services=Depends(get_services),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
