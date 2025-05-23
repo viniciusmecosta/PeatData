@@ -10,6 +10,14 @@ app = FastAPI(
     description="API for managing Peat Data operations, integrating **IoT devices** (via MQTT), **mobile applications** (historical data), and **notification services**, along with **administrative functions**.",
     version="2.0.0",
     openapi_tags=TAGS,
+    swagger_ui_parameters={
+        "docExpansion": "list",
+        "tryItOutEnabled": True,
+        "defaultModelsExpandDepth": -1,
+        "defaultModelExpandDepth": 0,
+        "persistAuthorization": True,
+        "displayRequestDuration": True,
+    },
 )
 
 app.add_middleware(

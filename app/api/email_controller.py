@@ -17,7 +17,11 @@ def get_email_service(db: Session = Depends(get_db)) -> EmailService:
     return EmailService(db)
 
 
-@router.post("/email")
+@router.post(
+    "/email",
+    summary="Adds an email address",
+    description="This endpoint allows you to add an email address to the database. The email must be valid and unique.",
+)
 def post_email(
     request: EmailRequest,
     services=Depends(get_email_service),
@@ -67,7 +71,12 @@ def post_email(
     }
 
 
-@router.get("/email", response_model=List[Email])
+@router.get(
+    "/email",
+    response_model=List[Email],
+    summary="Retrieves all registered email addresses",
+    description="This endpoint retrieves all email addresses registered in the system.",
+)
 def get_emails(
     services=Depends(get_email_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),

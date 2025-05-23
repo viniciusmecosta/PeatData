@@ -17,7 +17,11 @@ def get_sensor_data_service(db: Session = Depends(get_db)) -> SensorDataService:
     return SensorDataService(db)
 
 
-@router.post("/temp-humi")
+@router.post(
+    "/temp-humi",
+    summary="Submit temperature and humidity data",
+    description="This endpoint allows you to submit temperature and humidity data to the database.",
+)
 async def post_temperature_humidity(
     data: SensorDataRequest,
     services=Depends(get_sensor_data_service),
@@ -57,7 +61,11 @@ async def post_temperature_humidity(
     }
 
 
-@router.get("/temp-humi/avg/{n}")
+@router.get(
+    "/temp-humi/avg/{n}",
+    summary="Get average temperature and humidity for the past N days",
+    description="This endpoint retrieves the average temperature and humidity for the past N days.",
+)
 async def get_last_avg_sensor_data(
     n: int,
     services=Depends(get_sensor_data_service),
@@ -88,7 +96,12 @@ async def get_last_avg_sensor_data(
     return services.get_sensor_data_last_n_avg(n)
 
 
-@router.get("/temp-humi/last/{n}", response_model=List[SensorDataResponse])
+@router.get(
+    "/temp-humi/last/{n}",
+    response_model=List[SensorDataResponse],
+    summary="Get the last N temperature and humidity records",
+    description="This endpoint retrieves the last N temperature and humidity records, ordered by date.",
+)
 async def get_last_n_sensor_data(
     n: int,
     services=Depends(get_sensor_data_service),
@@ -122,6 +135,8 @@ async def get_last_n_sensor_data(
 @router.get(
     "/temp-humi/days/{days}",
     response_model=List[SensorDataResponse],
+    summary="Get temperature and humidity data for the past X days",
+    description="This endpoint retrieves temperature and humidity data for the past X days, with two entries per day.",
 )
 async def get_sensor_data_days(
     days: int,
@@ -156,6 +171,8 @@ async def get_sensor_data_days(
 @router.get(
     "/temp-humi/date/{date}",
     response_model=List[SensorDataResponse],
+    summary="Get temperature and humidity data for a specific date",
+    description="This endpoint retrieves temperature and humidity data for a specific date in `DDMMYYYY` format.",
 )
 async def get_sensor_data_date(
     date: str,

@@ -16,7 +16,11 @@ def get_phone_service(db: Session = Depends(get_db)) -> PhoneService:
     return PhoneService(db)
 
 
-@router.post("/phone")
+@router.post(
+    "/phone",
+    summary="Adds a phone number",
+    description="This endpoint allows you to add a phone number to the database. The phone number must be 11 digits long.",
+)
 def post_phone(
     request: PhoneRequest,
     services=Depends(get_phone_service),
@@ -57,7 +61,12 @@ def post_phone(
     }
 
 
-@router.get("/phone", response_model=List[Phone])
+@router.get(
+    "/phone",
+    response_model=List[Phone],
+    summary="Retrieves all registered phone numbers",
+    description="This endpoint retrieves all phone numbers registered in the system.",
+)
 def get_phones(
     services=Depends(get_phone_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),

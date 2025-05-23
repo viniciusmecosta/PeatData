@@ -17,7 +17,11 @@ def get_level_service(db: Session = Depends(get_db)) -> LevelService:
     return LevelService(db)
 
 
-@router.post("/level")
+@router.post(
+    "/level",
+    summary="Adds feeder occupation data",
+    description="Submit level data to the database.",
+)
 async def post_distance(
     data: LevelRequest,
     services=Depends(get_level_service),
@@ -53,7 +57,11 @@ async def post_distance(
     }
 
 
-@router.get("/level/avg/{n}")
+@router.get(
+    "/level/avg/{n}",
+    summary="Gets the average feeder occupation for the last n days",
+    description="Get the average level for the past N days.",
+)
 async def get_last_avg_level(
     n: int,
     services=Depends(get_level_service),
@@ -82,7 +90,12 @@ async def get_last_avg_level(
     return services.get_last_n_avg_level(n)
 
 
-@router.get("/level/last/{n}", response_model=List[LevelResponse])
+@router.get(
+    "/level/last/{n}",
+    response_model=List[LevelResponse],
+    summary="Gets the last N records of feeder occupation",
+    description="Get the last N level records, ordered by date.",
+)
 async def get_last_n_level_data(
     n: int,
     services=Depends(get_level_service),
@@ -111,7 +124,12 @@ async def get_last_n_level_data(
     return services.get_last_n_level_records(n)
 
 
-@router.get("/level/days/{days}", response_model=List[LevelResponse])
+@router.get(
+    "/level/days/{days}",
+    response_model=List[LevelResponse],
+    summary="Gets the feeder occupation records for the last N days",
+    description="Get level data for the past X days, ordered by date.",
+)
 async def get_level_days(
     days: int,
     services=Depends(get_level_service),
@@ -140,7 +158,12 @@ async def get_level_days(
     return services.get_level_by_days(days)
 
 
-@router.get("/level/date/{date}", response_model=List[LevelResponse])
+@router.get(
+    "/level/date/{date}",
+    response_model=List[LevelResponse],
+    summary="Gets the feeder occupation records on a specific date",
+    description="Get level data for a specific date in `DDMMYYYY` format.",
+)
 async def get_level_date(
     date: str,
     services=Depends(get_level_service),
