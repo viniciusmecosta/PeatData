@@ -1,5 +1,6 @@
-from typing import List
-from fastapi import APIRouter, Depends
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
@@ -24,31 +25,9 @@ def get_level_service(db: Session = Depends(get_db)) -> LevelService:
 )
 async def post_distance(
     data: LevelRequest,
-    services=Depends(get_level_service),
+    services: LevelService = Depends(get_level_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
 ):
-    """
-    Submit level data.
-
-    **Request body**:
-    - `level`: Level value.
-
-    **Example request**:
-    ```json
-    {
-      "level": 5.0
-    }
-    ```
-
-    **Example response**:
-    ```json
-    {
-      "message": "Level data received successfully",
-      "level": "78.0",
-      "date": "2025-04-11 09:46:52.799926"
-    }
-    ```
-    """
     response = services.handle_level(data.level)
     return {
         "message": "Level data received successfully",
@@ -58,131 +37,41 @@ async def post_distance(
 
 
 @router.get(
-    "/level/avg/{n}",
-    summary="Gets the average feeder occupation for the last n days",
-    description="Get the average level for the past N days.",
+    "/level",
+    summary="Gets feeder occupation data based on query parameters",
+    description="Retrieve level data using one of the query parameters: `avg`, `last`, `days`, or `date`.\n\n"
+    "Only one parameter should be provided per request.",
 )
-async def get_last_avg_level(
-    n: int,
-    services=Depends(get_level_service),
+async def get_level(
+    avg: Optional[int] = None,
+    last: Optional[int] = None,
+    days: Optional[int] = None,
+    date: Optional[str] = None,
+    services: LevelService = Depends(get_level_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
 ):
-    """
-    Get the average level for the past N days.
+    params_provided = sum(p is not None for p in [avg, last, days, date])
 
-    **Request**:
-    - `n`: Number of days for average calculation.
+    if params_provided == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Please provide one query parameter: 'avg', 'last', 'days', or 'date'.",
+        )
+    if params_provided > 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Please provide only one of the query parameters: 'avg', 'last', 'days', or 'date'.",
+        )
 
-    **Example response**:
-    ```json
-    [
-      {
-        "date": "18/03",
-        "level": 5.0
-      },
-      {
-        "date": "17/03",
-        "level": 4.8
-      }
-    ]
-    ```
-    """
-    return services.get_last_n_avg_level(n)
+    if avg is not None:
+        return services.get_last_n_avg_level(avg)
+    elif last is not None:
+        return services.get_last_n_level_records(last)
+    elif days is not None:
+        return services.get_level_by_days(days)
+    elif date is not None:
+        return services.get_level_by_date(date)
 
-
-@router.get(
-    "/level/last/{n}",
-    response_model=List[LevelResponse],
-    summary="Gets the last N records of feeder occupation",
-    description="Get the last N level records, ordered by date.",
-)
-async def get_last_n_level_data(
-    n: int,
-    services=Depends(get_level_service),
-    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
-):
-    """
-    Get the last N level records, ordered by date.
-
-    **Request**:
-    - `n`: Number of latest level records.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "date": "2025-03-11T10:20:30Z",
-        "level": 5.0
-      },
-      {
-        "date": "2025-03-10T10:20:30Z",
-        "level": 4.9
-      }
-    ]
-    ```
-    """
-    return services.get_last_n_level_records(n)
-
-
-@router.get(
-    "/level/days/{days}",
-    response_model=List[LevelResponse],
-    summary="Gets the feeder occupation records for the last N days",
-    description="Get level data for the past X days, ordered by date.",
-)
-async def get_level_days(
-    days: int,
-    services=Depends(get_level_service),
-    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
-):
-    """
-    Get level data for the past X days.
-
-    **Request**:
-    - `days`: Number of days to look back.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "date": "2025-03-11T10:20:30Z",
-        "level": 5.0
-      },
-      {
-        "date": "2025-03-10T10:20:30Z",
-        "level": 4.9
-      }
-    ]
-    ```
-    """
-    return services.get_level_by_days(days)
-
-
-@router.get(
-    "/level/date/{date}",
-    response_model=List[LevelResponse],
-    summary="Gets the feeder occupation records on a specific date",
-    description="Get level data for a specific date in `DDMMYYYY` format.",
-)
-async def get_level_date(
-    date: str,
-    services=Depends(get_level_service),
-    credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
-):
-    """
-    Get level data for a specific date.
-
-    **Request**:
-    - `date`: Date in `DDMMYYYY` format.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "date": "10:20",
-        "level": 5.0
-      }
-    ]
-    ```
-    """
-    return services.get_level_by_date(date)
+    raise HTTPException(
+        status_code=500, detail="Internal server error: No valid parameter processed."
+    )
