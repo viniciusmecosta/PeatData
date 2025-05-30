@@ -26,30 +26,7 @@ def post_phone(
     services=Depends(get_phone_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
 ):
-    """
-    Adds a phone number in the database.
-
-    **Request**:
-    - `name`: Name associated with the phone number.
-    - `number`: Phone number (must be 11 digits).
-
-    **Example request**:
-    ```json
-    {
-      "name": "João Silva",
-      "number": "11987654321"
-    }
-    ```
-
-    **Example response**:
-    ```json
-    {
-      "message": "Phone number added successfully",
-      "name": "João Silva",
-      "number": "11987654321"
-    }
-    ```
-    """
+   
     if len(request.number) != 11 or not request.number.isdigit():
         raise HTTPException(status_code=400, detail="Number must have 11 digits")
 
@@ -71,17 +48,5 @@ def get_phones(
     services=Depends(get_phone_service),
     credentials: HTTPAuthorizationCredentials = Depends(auth.verify_token),
 ):
-    """
-    Retrieves all registered phone numbers.
-
-    **Example response**:
-    ```json
-    [
-      {
-        "name": "João Silva",
-        "number": "11987654321",
-      }
-    ]
-    ```
-    """
+    
     return services.get_all_phones()
